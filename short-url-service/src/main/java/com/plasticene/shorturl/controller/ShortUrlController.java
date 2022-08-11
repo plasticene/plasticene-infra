@@ -1,9 +1,18 @@
 package com.plasticene.shorturl.controller;
 
+import com.plasticene.boot.common.exception.BizException;
 import com.plasticene.shorturl.param.ShortUrlParam;
+import com.plasticene.shorturl.service.ShortUrlService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author fjzheng
@@ -16,9 +25,25 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping
 public class ShortUrlController {
 
+    @Resource
+    private ShortUrlService shortUrlService;
+
     @PostMapping("/short/url")
-    public void generateShortUrl(@RequestBody @Validated ShortUrlParam param){
+    @ApiOperation("生成短链接地址")
+    public String generateShortUrl(@RequestBody @Validated ShortUrlParam param){
+        String url = param.getLongUrl().trim();
+        String shortUrl = shortUrlService.generateShortUrl(url);
+        return shortUrl;
+    }
 
+    @GetMapping("/x/{uniqueCode}")
+    public void redirect(HttpServletRequest request, HttpServletResponse response,
+                         @PathVariable("uniqueCode") String uniqueCode) throws IOException {
 
+        String originUrl = shortUrlService.getOriginUrl(uniqueCode);
+        if (StringUtils.isBlank(originUrl)) {
+            throw new BizException("短链接地址不存在");
+        }
+        response.sendRedirect(originUrl);
     }
 }

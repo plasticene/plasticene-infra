@@ -7,5 +7,7 @@ package com.plasticene.shorturl.service;
  */
 public interface ShortUrlService {
 
-    void generateShortUrl(String longUrl);
+    String generateShortUrl(String longUrl);
+
+    String getOriginUrl(String uniqueCode);
 }
