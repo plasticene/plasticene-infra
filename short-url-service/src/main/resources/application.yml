@@ -1,0 +1,6 @@
+server:
+  port: 18800
+
+spring:
+  profiles:
+    active: local
