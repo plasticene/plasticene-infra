@@ -10,4 +10,5 @@ public interface ShortUrlService {
     String generateShortUrl(String longUrl);
 
     String getOriginUrl(String uniqueCode);
+
 }

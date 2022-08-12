@@ -22,16 +22,20 @@ import java.util.regex.Pattern;
 
 @Service
 public class ShortUrlServiceImpl implements ShortUrlService {
+
+
     private static final String DOMAIN = "http://127.0.0.1:18800/x/";
 
     @Resource
     private UrlLinkDAO urlLinkDAO;
+    @Resource
+    private IdGenerator idGenerator;
+
     @Override
     public String generateShortUrl(String longUrl) {
         if (!isValidUrl(longUrl)) {
             throw new BizException("无效的url");
         }
-        IdGenerator idGenerator = new IdGenerator(0, 0);
         long id = idGenerator.nextId();
         String uniqueCode = RandomUtils.to62RadixString(id);
         String longUrlMd5 = DigestUtils.md5DigestAsHex(longUrl.getBytes());
@@ -56,10 +60,13 @@ public class ShortUrlServiceImpl implements ShortUrlService {
         return urlLink == null ? null : urlLink.getLongUrl();
     }
 
+
+
     public boolean isValidUrl(String urls) {
         boolean isurl;
         String regex = "(((https|http)?://)?([a-z0-9]+[.])|(www.))"
-                + "\\w+[.|\\/]([a-z0-9]{0,})?[[.]([a-z0-9]{0,})]+((/[\\S&&[^,;\u4E00-\u9FA5]]+)+)?([.][a-z0-9]{0,}+|/?)";//设置正则表达式
+                + "\\w+[.|\\/]([a-z0-9]{0,})?[[.]([a-z0-9]{0,})]+((/[\\S&&[^,;\u4E00-\u9FA5]]+)+)"
+                + "?([.][a-z0-9]{0,}+|/?)";
         //对比
         Pattern pat = Pattern.compile(regex.trim());
         Matcher mat = pat.matcher(urls.trim());
