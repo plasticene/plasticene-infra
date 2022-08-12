@@ -3,8 +3,8 @@ package com.plasticene.shorturl.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.plasticene.boot.common.exception.BizException;
 import com.plasticene.boot.common.utils.IdGenerator;
-import com.plasticene.shorturl.dao.ShortUrlDAO;
-import com.plasticene.shorturl.entity.ShortUrl;
+import com.plasticene.shorturl.dao.UrlLinkDAO;
+import com.plasticene.shorturl.entity.UrlLink;
 import com.plasticene.shorturl.service.ShortUrlService;
 import com.plasticene.shorturl.utils.RandomUtils;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class ShortUrlServiceImpl implements ShortUrlService {
     private static final String DOMAIN = "http://127.0.0.1:18800/x/";
 
     @Resource
-    private ShortUrlDAO shortUrlDAO;
+    private UrlLinkDAO urlLinkDAO;
     @Override
     public String generateShortUrl(String longUrl) {
         if (!isValidUrl(longUrl)) {
@@ -35,28 +35,29 @@ public class ShortUrlServiceImpl implements ShortUrlService {
         long id = idGenerator.nextId();
         String uniqueCode = RandomUtils.to62RadixString(id);
         String longUrlMd5 = DigestUtils.md5DigestAsHex(longUrl.getBytes());
-        ShortUrl shortUrl = new ShortUrl();
-        shortUrl.setId(id);
-        shortUrl.setUniqueCode(uniqueCode);
-        shortUrl.setShortUrl(DOMAIN + uniqueCode);
-        shortUrl.setLongUrl(longUrl);
-        shortUrl.setLongUrlMd5(longUrlMd5);
-        shortUrlDAO.insert(shortUrl);
-        return DOMAIN + uniqueCode;
+        String shortUrl = DOMAIN + uniqueCode;
+        UrlLink urlLink = new UrlLink();
+        urlLink.setId(id);
+        urlLink.setUniqueCode(uniqueCode);
+        urlLink.setShortUrl(DOMAIN + uniqueCode);
+        urlLink.setLongUrl(longUrl);
+        urlLink.setLongUrlMd5(longUrlMd5);
+        urlLinkDAO.insert(urlLink);
+        return shortUrl;
 
 
     }
 
     @Override
     public String getOriginUrl(String uniqueCode) {
-        LambdaQueryWrapper<ShortUrl> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ShortUrl::getUniqueCode, uniqueCode);
-        ShortUrl shortUrl = shortUrlDAO.selectOne(queryWrapper);
-        return shortUrl == null ? null : shortUrl.getLongUrl();
+        LambdaQueryWrapper<UrlLink> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UrlLink::getUniqueCode, uniqueCode);
+        UrlLink urlLink = urlLinkDAO.selectOne(queryWrapper);
+        return urlLink == null ? null : urlLink.getLongUrl();
     }
 
     public boolean isValidUrl(String urls) {
-        boolean isurl = false;
+        boolean isurl;
         String regex = "(((https|http)?://)?([a-z0-9]+[.])|(www.))"
                 + "\\w+[.|\\/]([a-z0-9]{0,})?[[.]([a-z0-9]{0,})]+((/[\\S&&[^,;\u4E00-\u9FA5]]+)+)?([.][a-z0-9]{0,}+|/?)";//设置正则表达式
         //对比
