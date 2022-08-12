@@ -1,8 +1,8 @@
 package com.plasticene.shorturl.utils;
 
-import org.apache.commons.lang3.StringUtils;
-
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * @author fjzheng
@@ -46,7 +46,7 @@ public class RandomUtils {
      * @param seq
      * @return
      */
-    public static String generateUniqueCode(long seq, long randomLength) {
+    public static String generateCode(long seq, long randomLength) {
         String s = to62RadixString(seq);
         Random random = new Random(System.currentTimeMillis());
         int count = 0;
@@ -59,30 +59,21 @@ public class RandomUtils {
         return s + randomStr.toString();
     }
 
-    private static final String CHARS = "oNWxUYwrXdCOIj4ck6M8RbiQa3H91pSmZTAh70zquLnKvt2VyEGlBsPJgDe5Ff";
-    private static final int SCALE = 62;
-    private static final int MIN_LENGTH = 5;
-
-    /**
-     * 数字转62进制
-     *
-     * @param num num
-     * @return String
-     */
-    public static String encode62(long num) {
-        StringBuilder builder = new StringBuilder();
-        int remainder;
-        while (num > SCALE - 1) {
-            remainder = Long.valueOf(num % SCALE).intValue();
-            builder.append(CHARS.charAt(remainder));
-            num = num / SCALE;
+    // 生成随机码
+    public static String generateCode(long length) {
+        Random random = new Random();
+        int count = 0;
+        StringBuilder randomStr = new StringBuilder();
+        while(count < length) {
+            int num = random.nextInt(Integer.MAX_VALUE);
+            int index = num % digits.length;
+            randomStr.append(digits[index]);
+            count++;
         }
-        builder.append(CHARS.charAt(Long.valueOf(num).intValue()));
-        String value = builder.reverse().toString();
-        return StringUtils.leftPad(value, MIN_LENGTH, '0');
+        return randomStr.toString();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 //        IdGenerator snowFlake = new IdGenerator(2, 3);
 //        for (int i = 0; i < 10; i++) {
 //            long seq = snowFlake.nextId();
@@ -90,12 +81,17 @@ public class RandomUtils {
 //            String s1 = to62RadixString(seq);
 //            System.out.println(s1);
 //        }
-        long seq = 62l*62l*62l*62l*62l*62l*62l;
-        System.out.println(seq);
-        String s = to62RadixString( seq);
-        System.out.println(s);
-        String s1 = encode62(seq);
-        System.out.println(s1);
+//        long seq = 62l*62l*62l*62l*62l*62l*62l;
+//        System.out.println(seq);
+//        String s = to62RadixString( seq);
+//        System.out.println(s);
+//        String s1 = encode62(seq);
+//        System.out.println(s1);
+        Set<String> codes = new HashSet<>();
+        for(int i=0;i<1000;i++){
+            codes.add(generateCode(6));
+        }
+        System.out.println(codes.size());
 
 
     }
