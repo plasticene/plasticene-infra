@@ -9,10 +9,30 @@ import lombok.Data;
  * @date 2022/8/11 16:55
  */
 @Data
-public class ShortUrl extends BaseDO {
+public class UrlLink extends BaseDO {
+
+    /**
+     * 主键
+     */
     private Long id;
+
+    /**
+     * 唯一压缩码
+     */
     private String uniqueCode;
+
+    /**
+     * 短链接地址
+     */
     private String shortUrl;
+
+    /**
+     * 原始长连接地址
+     */
     private String longUrl;
+
+    /**
+     * 长链接地址
+     */
     private String longUrlMd5;
 }
