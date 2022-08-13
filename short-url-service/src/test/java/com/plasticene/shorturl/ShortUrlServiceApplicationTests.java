@@ -30,4 +30,9 @@ public class ShortUrlServiceApplicationTests {
         uniqueCodeService.generateUniqueCode();
     }
 
+    @Test
+    public void getUniqueCode() {
+        uniqueCodeService.getUniqueCode();
+    }
+
 }
