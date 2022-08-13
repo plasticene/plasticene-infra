@@ -7,6 +7,7 @@ import com.plasticene.shorturl.entity.UniqueCode;
 import com.plasticene.shorturl.service.UniqueCodeService;
 import com.plasticene.shorturl.utils.RandomUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,7 @@ import java.util.Set;
 @Service
 public class UniqueCodeServiceImpl extends ServiceImpl<UniqueCodeDAO, UniqueCode> implements UniqueCodeService {
     @Resource
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
     @Resource
     private IdGenerator idGenerator;
 
@@ -40,7 +41,7 @@ public class UniqueCodeServiceImpl extends ServiceImpl<UniqueCodeDAO, UniqueCode
             String s = RandomUtils.generateCode(6);
             codes.add(s);
         }
-        redisTemplate.opsForSet().add(UNIQUE_CODE_KEY, codes.toArray());
+        stringRedisTemplate.opsForSet().add(UNIQUE_CODE_KEY, codes.toArray(new String[codes.size()]));
         List<UniqueCode> uniqueCodeList = new ArrayList<>();
         codes.forEach(code -> {
             UniqueCode uniqueCode = new UniqueCode();
@@ -53,8 +54,9 @@ public class UniqueCodeServiceImpl extends ServiceImpl<UniqueCodeDAO, UniqueCode
 
 
     @Override
-    public void getUniqueCode() {
-
+    public String getUniqueCode() {
+        String code = stringRedisTemplate.opsForSet().pop(UNIQUE_CODE_KEY);
+        return code;
     }
 
     @Override

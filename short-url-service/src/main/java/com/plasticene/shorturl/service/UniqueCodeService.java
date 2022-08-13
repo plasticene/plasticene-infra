@@ -11,7 +11,7 @@ public interface UniqueCodeService {
 
     void generateUniqueCode();
 
-    void getUniqueCode();
+    String getUniqueCode();
 
     Set<String> getUniqueCode(Integer size);
 
