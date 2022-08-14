@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class IdConfig {
 
-    @Value("${ptc.datacenter-id : 1}")
+    @Value("${ptc.datacenter-id : 0}")
     private Long datacenterId;
-    @Value("${ptc.worker-id : 1}")
+    @Value("${ptc.worker-id : 0}")
     private Long workerId;
 
     @Bean
