@@ -1,5 +1,7 @@
 package com.plasticene.shorturl.service;
 
+import com.plasticene.shorturl.entity.UrlLink;
+
 /**
  * @author fjzheng
  * @version 1.0
@@ -10,5 +12,7 @@ public interface ShortUrlService {
     String generateShortUrl(String longUrl);
 
     String getOriginUrl(String uniqueCode);
+
+    UrlLink getUrlLink(String uniqueCode);
 
 }

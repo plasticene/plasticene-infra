@@ -54,12 +54,17 @@ public class ShortUrlServiceImpl implements ShortUrlService {
 
     @Override
     public String getOriginUrl(String uniqueCode) {
-        LambdaQueryWrapper<UrlLink> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UrlLink::getUniqueCode, uniqueCode);
-        UrlLink urlLink = urlLinkDAO.selectOne(queryWrapper);
+        UrlLink urlLink = getUrlLink(uniqueCode);
         return urlLink == null ? null : urlLink.getLongUrl();
     }
 
+    @Override
+    public UrlLink getUrlLink(String uniqueCode) {
+        LambdaQueryWrapper<UrlLink> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UrlLink::getUniqueCode, uniqueCode);
+        UrlLink urlLink = urlLinkDAO.selectOne(queryWrapper);
+        return urlLink;
+    }
 
 
     public boolean isValidUrl(String urls) {
