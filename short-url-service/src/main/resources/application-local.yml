@@ -47,3 +47,7 @@ ptc:
   apiLog:
     enable: true
 
+unique-code:
+  max-size: 1000
+  min-size: 200
+
