@@ -9,6 +9,8 @@ spring:
   redis:
     host: 110.42.224.58
     port: 6379
+  main:
+    allow-circular-references: true
 #  mvc:
 #    pathmatch:
 #      matching-strategy: ant_path_matcher
