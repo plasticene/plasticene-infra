@@ -22,7 +22,7 @@ import java.io.IOException;
 @RestController
 @ResponseBody
 @Api(tags = "短链接管理")
-@RequestMapping
+@RequestMapping("/api")
 public class ShortUrlController {
 
     @Resource
@@ -34,16 +34,5 @@ public class ShortUrlController {
         String url = param.getLongUrl().trim();
         String shortUrl = shortUrlService.generateShortUrl(url);
         return shortUrl;
-    }
-
-    @GetMapping("/x/{uniqueCode}")
-    public void redirect(HttpServletRequest request, HttpServletResponse response,
-                         @PathVariable("uniqueCode") String uniqueCode) throws IOException {
-
-        String originUrl = shortUrlService.getOriginUrl(uniqueCode);
-        if (StringUtils.isBlank(originUrl)) {
-            throw new BizException("短链接地址不存在");
-        }
-        response.sendRedirect(originUrl);
     }
 }
