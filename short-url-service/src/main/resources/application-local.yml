@@ -53,3 +53,5 @@ unique-code:
   max-size: 1000
   min-size: 200
 
+bloom-init: false
+
