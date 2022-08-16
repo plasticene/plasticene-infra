@@ -6,6 +6,7 @@ import com.plasticene.boot.common.utils.IdGenerator;
 import com.plasticene.shorturl.dao.UrlLinkDAO;
 import com.plasticene.shorturl.entity.UrlLink;
 import com.plasticene.shorturl.service.ShortUrlService;
+import com.plasticene.shorturl.service.UniqueCodeService;
 import com.plasticene.shorturl.utils.RandomUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -24,12 +25,14 @@ import java.util.regex.Pattern;
 public class ShortUrlServiceImpl implements ShortUrlService {
 
 
-    private static final String DOMAIN = "http://127.0.0.1:18800/x/";
+    private static final String DOMAIN = "http://127.0.0.1:18800/";
 
     @Resource
     private UrlLinkDAO urlLinkDAO;
     @Resource
     private IdGenerator idGenerator;
+    @Resource
+    private UniqueCodeService uniqueCodeService;
 
     @Override
     public String generateShortUrl(String longUrl) {
@@ -37,7 +40,7 @@ public class ShortUrlServiceImpl implements ShortUrlService {
             throw new BizException("无效的url");
         }
         long id = idGenerator.nextId();
-        String uniqueCode = RandomUtils.to62RadixString(id);
+        String uniqueCode = uniqueCodeService.getUniqueCode();
         String longUrlMd5 = DigestUtils.md5DigestAsHex(longUrl.getBytes());
         String shortUrl = DOMAIN + uniqueCode;
         UrlLink urlLink = new UrlLink();
