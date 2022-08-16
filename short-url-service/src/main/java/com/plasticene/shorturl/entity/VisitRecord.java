@@ -25,5 +25,9 @@ public class VisitRecord extends BaseDO {
     private String osType;
     private String osVersion;
     private String deviceType;
+    private String country;
+    private String province;
+    private String city;
+    private String isp;
 
 }
