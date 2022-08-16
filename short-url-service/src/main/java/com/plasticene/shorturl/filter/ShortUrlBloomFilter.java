@@ -5,11 +5,9 @@ import com.plasticene.boot.common.pojo.PageResult;
 import com.plasticene.shorturl.entity.UniqueCode;
 import com.plasticene.shorturl.service.UniqueCodeService;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.Redisson;
 import org.redisson.api.RBloomFilter;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -29,13 +27,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ShortUrlBloomFilter implements InitializingBean {
     @Resource
-    private RedissonClient redissonClient;
-    @Resource
     private RedisTemplate redisTemplate;
     @Resource
     private UniqueCodeService uniqueCodeService;
     @Resource
     private RBloomFilter bloomFilter;
+
+    @Value("${bloom-init: false}")
+    private Boolean BloomInit;
 
     private static final String UNIQUE_CODE_BLOOM_FILTER_KEY = "bf:unique-code";
 
@@ -45,6 +44,9 @@ public class ShortUrlBloomFilter implements InitializingBean {
     }
 
     public void initBloomFilter() {
+        if (!BloomInit) {
+            return;
+        }
         log.info("===============初始化BloomFilter==============");
         long startTime = System.currentTimeMillis();
         // 删除布隆过滤器key
@@ -73,6 +75,7 @@ public class ShortUrlBloomFilter implements InitializingBean {
         bloomFilter.add(code);
     }
 
+    // 这里使用循环添加key是低效的
     public void addAll(Set<String> codes) {
         codes.forEach(code -> {
             bloomFilter.add(code);
