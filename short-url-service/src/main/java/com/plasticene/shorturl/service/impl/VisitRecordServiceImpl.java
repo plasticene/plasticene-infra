@@ -2,6 +2,8 @@ package com.plasticene.shorturl.service.impl;
 
 import cn.hutool.crypto.digest.DigestUtil;
 import com.plasticene.boot.common.utils.IdGenerator;
+import com.plasticene.shorturl.dao.VisitRecordDAO;
+import com.plasticene.shorturl.dto.IpRegion;
 import com.plasticene.shorturl.entity.UrlLink;
 import com.plasticene.shorturl.entity.VisitRecord;
 import com.plasticene.shorturl.service.ShortUrlService;
@@ -11,9 +13,11 @@ import eu.bitwalker.useragentutils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -28,25 +32,33 @@ public class VisitRecordServiceImpl implements VisitRecordService {
     private static final String USER_AGENT = "User-Agent";
 
     @Resource
-    private ShortUrlService shortUrlService;
+    private VisitRecordDAO visitRecordDAO;
     @Resource
     private IdGenerator idGenerator;
 
 
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addVisitRecord(HttpServletRequest request, UrlLink urlLink) {
         VisitRecord visitRecord = new VisitRecord();
         long id = idGenerator.nextId();
         visitRecord.setId(id);
         visitRecord.setUrlLinkId(urlLink.getId());
         visitRecord.setUniqueCode(urlLink.getUniqueCode());
+        visitRecord.setVisitTime(new Date());
         String agent = request.getHeader(USER_AGENT);
         String clientIp = IpUtils.getRemoteHost(request);
+        IpRegion ipRegion = IpUtils.getIpRegion(clientIp);
         visitRecord.setUserAgent(agent);
         visitRecord.setClientIp(clientIp);
         // 身份唯一标识,算法:SHA-1(客户端IP + '-' + UserAgent)
         String clientId = DigestUtil.sha1Hex(clientIp + "&" + agent);
         visitRecord.setClientId(clientId);
+        visitRecord.setCountry(ipRegion.getCountry());
+        visitRecord.setProvince(ipRegion.getProvince());
+        visitRecord.setCity(ipRegion.getCity());
+        visitRecord.setIsp(ipRegion.getIsp());
 
         // 解析User-Agent
         if (StringUtils.isNotBlank(agent)) {
@@ -67,11 +79,9 @@ public class VisitRecordServiceImpl implements VisitRecordService {
                 Version browserVersion = userAgent.getBrowserVersion();
                 Optional.ofNullable(browserVersion).ifPresent(x -> visitRecord.setBrowserVersion(x.getVersion()));
             } catch (Exception e) {
-                log.error("解析TransformEvent中的UserAgent异常,事件内容:", e);
+                log.error("解析UserAgent异常,事件内容:", e);
             }
         }
-
-
-
+        visitRecordDAO.insert(visitRecord);
     }
 }
