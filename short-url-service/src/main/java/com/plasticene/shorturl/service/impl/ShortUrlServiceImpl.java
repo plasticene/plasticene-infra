@@ -2,16 +2,25 @@ package com.plasticene.shorturl.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.plasticene.boot.common.exception.BizException;
+import com.plasticene.boot.common.pojo.PageParam;
+import com.plasticene.boot.common.pojo.PageResult;
 import com.plasticene.boot.common.utils.IdGenerator;
+import com.plasticene.boot.common.utils.PtcBeanUtils;
+import com.plasticene.boot.mybatis.core.query.LambdaQueryWrapperX;
 import com.plasticene.shorturl.dao.UrlLinkDAO;
+import com.plasticene.shorturl.dto.UrlLinkDTO;
 import com.plasticene.shorturl.entity.UrlLink;
+import com.plasticene.shorturl.query.UrlLinkQuery;
 import com.plasticene.shorturl.service.ShortUrlService;
 import com.plasticene.shorturl.service.UniqueCodeService;
 import com.plasticene.shorturl.utils.RandomUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,9 +78,35 @@ public class ShortUrlServiceImpl implements ShortUrlService {
         return urlLink;
     }
 
+    @Override
+    public PageResult<UrlLinkDTO> getList(UrlLinkQuery query) {
+        LambdaQueryWrapperX<UrlLink> queryWrapper = new LambdaQueryWrapperX<>();
+        queryWrapper.eqIfPresent(UrlLink::getUniqueCode, query.getUniqueCode());
+        PageParam pageParam = new PageParam(query.getPageNo(), query.getPageSize());
+        PageResult<UrlLink> pageResult = urlLinkDAO.selectPage(pageParam, queryWrapper);
+        List<UrlLinkDTO> urlLinkDTOList = toUrlLinkDTOList(pageResult.getList());
+        PageResult<UrlLinkDTO> result = new PageResult<>();
+        result.setList(urlLinkDTOList);
+        result.setTotal(pageResult.getTotal());
+        result.setPages(pageResult.getTotal());
+        return result;
+    }
+
+    List<UrlLinkDTO> toUrlLinkDTOList(List<UrlLink> urlLinks) {
+        List<UrlLinkDTO> urlLinkDTOList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(urlLinks)) {
+            return urlLinkDTOList;
+        }
+        urlLinks.forEach(urlLink -> {
+            UrlLinkDTO urlLinkDTO = PtcBeanUtils.copy(urlLink, UrlLinkDTO.class);
+            urlLinkDTOList.add(urlLinkDTO);
+        });
+        return urlLinkDTOList;
+    }
+
 
     public boolean isValidUrl(String urls) {
-        boolean isurl;
+        boolean isUrl;
         String regex = "(((https|http)?://)?([a-z0-9]+[.])|(www.))"
                 + "\\w+[.|\\/]([a-z0-9]{0,})?[[.]([a-z0-9]{0,})]+((/[\\S&&[^,;\u4E00-\u9FA5]]+)+)"
                 + "?([.][a-z0-9]{0,}+|/?)";
@@ -79,10 +114,10 @@ public class ShortUrlServiceImpl implements ShortUrlService {
         Pattern pat = Pattern.compile(regex.trim());
         Matcher mat = pat.matcher(urls.trim());
         //判断是否匹配
-        isurl = mat.matches();
-        if (isurl) {
-            isurl = true;
+        isUrl = mat.matches();
+        if (isUrl) {
+            isUrl = true;
         }
-        return isurl;
+        return isUrl;
     }
 }
