@@ -1,6 +1,9 @@
 package com.plasticene.shorturl.service;
 
+import com.plasticene.boot.common.pojo.PageResult;
+import com.plasticene.shorturl.dto.VisitRecordDTO;
 import com.plasticene.shorturl.entity.UrlLink;
+import com.plasticene.shorturl.query.VisitQuery;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,4 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 public interface VisitRecordService {
 
     void addVisitRecord(HttpServletRequest request, UrlLink urlLink);
+
+    PageResult<VisitRecordDTO> getList(VisitQuery query);
 }

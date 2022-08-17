@@ -1,11 +1,18 @@
 package com.plasticene.shorturl.service.impl;
 
 import cn.hutool.crypto.digest.DigestUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.plasticene.boot.common.pojo.PageParam;
+import com.plasticene.boot.common.pojo.PageResult;
 import com.plasticene.boot.common.utils.IdGenerator;
+import com.plasticene.boot.common.utils.PtcBeanUtils;
+import com.plasticene.boot.mybatis.core.query.LambdaQueryWrapperX;
 import com.plasticene.shorturl.dao.VisitRecordDAO;
 import com.plasticene.shorturl.dto.IpRegion;
+import com.plasticene.shorturl.dto.VisitRecordDTO;
 import com.plasticene.shorturl.entity.UrlLink;
 import com.plasticene.shorturl.entity.VisitRecord;
+import com.plasticene.shorturl.query.VisitQuery;
 import com.plasticene.shorturl.service.ShortUrlService;
 import com.plasticene.shorturl.service.VisitRecordService;
 import com.plasticene.shorturl.utils.IpUtils;
@@ -14,10 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -83,5 +93,31 @@ public class VisitRecordServiceImpl implements VisitRecordService {
             }
         }
         visitRecordDAO.insert(visitRecord);
+    }
+
+    @Override
+    public PageResult<VisitRecordDTO> getList(VisitQuery query) {
+        LambdaQueryWrapperX<VisitRecord> queryWrapper = new LambdaQueryWrapperX<>();
+        queryWrapper.eqIfPresent(VisitRecord::getUniqueCode, query.getUniqueCode());
+        PageParam pageParam = new PageParam(query.getPageNo(), query.getPageSize());
+        PageResult<VisitRecord> pageResult = visitRecordDAO.selectPage(pageParam, queryWrapper);
+        List<VisitRecordDTO> visitRecordDTOList = toVisitRecordDTOList(pageResult.getList());
+        PageResult<VisitRecordDTO> result = new PageResult<>();
+        result.setList(visitRecordDTOList);
+        result.setTotal(pageResult.getTotal());
+        result.setPages(pageResult.getPages());
+        return result;
+    }
+
+    List<VisitRecordDTO> toVisitRecordDTOList(List<VisitRecord> visitRecords) {
+        List<VisitRecordDTO> visitRecordDTOList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(visitRecords)) {
+            return visitRecordDTOList;
+        }
+        visitRecords.forEach(visitRecord -> {
+            VisitRecordDTO visitRecordDTO = PtcBeanUtils.copy(visitRecord, VisitRecordDTO.class);
+            visitRecordDTOList.add(visitRecordDTO);
+        });
+        return visitRecordDTOList;
     }
 }
