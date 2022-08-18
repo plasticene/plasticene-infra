@@ -4,6 +4,7 @@ import com.plasticene.boot.common.pojo.PageParam;
 import com.plasticene.boot.common.pojo.PageResult;
 import com.plasticene.shorturl.entity.UniqueCode;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,7 +18,7 @@ public interface UniqueCodeService {
 
     String getUniqueCode();
 
-    Set<String> getUniqueCode(Integer size);
+    List<String> getUniqueCode(Integer size);
 
     PageResult<UniqueCode> getUnusedList(PageParam pageParam);
 

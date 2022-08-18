@@ -13,7 +13,6 @@ import com.plasticene.shorturl.service.UniqueCodeService;
 import com.plasticene.shorturl.utils.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,10 +60,10 @@ public class UniqueCodeServiceImpl extends ServiceImpl<UniqueCodeDAO, UniqueCode
     }
 
     @Override
-    public Set<String> getUniqueCode(Integer size) {
+    public List<String> getUniqueCode(Integer size) {
         List<String> codes = stringRedisTemplate.opsForSet().pop(UNIQUE_CODE_KEY, size);
         asyncGenerateUniqueCode();
-        return new HashSet<>(codes);
+        return codes;
     }
 
     @Override
