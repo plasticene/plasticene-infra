@@ -15,4 +15,9 @@ public class ShortUrlParam {
     @ApiModelProperty("长连接地址")
     @NotBlank(message = "长地址不能为空")
     private String longUrl;
+
+    @ApiModelProperty("长连接地址标识id")
+    private Long requestId;
+
+
 }
