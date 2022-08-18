@@ -1,28 +1,35 @@
 package com.plasticene.shorturl.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.plasticene.boot.common.exception.BizException;
 import com.plasticene.boot.common.pojo.PageParam;
 import com.plasticene.boot.common.pojo.PageResult;
 import com.plasticene.boot.common.utils.IdGenerator;
 import com.plasticene.boot.common.utils.PtcBeanUtils;
 import com.plasticene.boot.mybatis.core.query.LambdaQueryWrapperX;
+import com.plasticene.shorturl.UrlLinkVO;
 import com.plasticene.shorturl.dao.UrlLinkDAO;
 import com.plasticene.shorturl.dto.UrlLinkDTO;
 import com.plasticene.shorturl.entity.UrlLink;
+import com.plasticene.shorturl.param.ShortUrlParam;
 import com.plasticene.shorturl.query.UrlLinkQuery;
 import com.plasticene.shorturl.service.ShortUrlService;
 import com.plasticene.shorturl.service.UniqueCodeService;
 import com.plasticene.shorturl.utils.RandomUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author fjzheng
@@ -31,10 +38,11 @@ import java.util.regex.Pattern;
  */
 
 @Service
-public class ShortUrlServiceImpl implements ShortUrlService {
+public class ShortUrlServiceImpl extends ServiceImpl<UrlLinkDAO, UrlLink> implements ShortUrlService {
 
 
-    private static final String DOMAIN = "http://127.0.0.1:18800/";
+    @Value("${ptc.domain}")
+    private String domain;
 
     @Resource
     private UrlLinkDAO urlLinkDAO;
@@ -42,30 +50,43 @@ public class ShortUrlServiceImpl implements ShortUrlService {
     private IdGenerator idGenerator;
     @Resource
     private UniqueCodeService uniqueCodeService;
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    private static final String SHORT_LONG_MAP = "short_long_url";
+    private static final String LONG_MD5_CODE_MAP = "long_md5_short";
 
     @Override
     public String generateShortUrl(String longUrl) {
         if (!isValidUrl(longUrl)) {
             throw new BizException("无效的url");
         }
+        Object value = redisTemplate.opsForHash().get(LONG_MD5_CODE_MAP, longUrl);
+        if (Objects.nonNull(value)) {
+            return domain + value.toString();
+        }
         long id = idGenerator.nextId();
         String uniqueCode = uniqueCodeService.getUniqueCode();
         String longUrlMd5 = DigestUtils.md5DigestAsHex(longUrl.getBytes());
-        String shortUrl = DOMAIN + uniqueCode;
+        String shortUrl = domain + uniqueCode;
         UrlLink urlLink = new UrlLink();
         urlLink.setId(id);
         urlLink.setUniqueCode(uniqueCode);
-        urlLink.setShortUrl(DOMAIN + uniqueCode);
+        urlLink.setShortUrl(shortUrl);
         urlLink.setLongUrl(longUrl);
         urlLink.setLongUrlMd5(longUrlMd5);
         urlLinkDAO.insert(urlLink);
+        redisTemplate.opsForHash().put(SHORT_LONG_MAP, uniqueCode, longUrl);
+        redisTemplate.opsForHash().put(LONG_MD5_CODE_MAP, longUrlMd5, uniqueCode);
         return shortUrl;
-
-
     }
 
     @Override
     public String getOriginUrl(String uniqueCode) {
+        Object value = redisTemplate.opsForHash().get(SHORT_LONG_MAP, uniqueCode);
+        if (Objects.nonNull(value)) {
+            return value.toString();
+        }
         UrlLink urlLink = getUrlLink(uniqueCode);
         return urlLink == null ? null : urlLink.getLongUrl();
     }
@@ -90,6 +111,59 @@ public class ShortUrlServiceImpl implements ShortUrlService {
         result.setTotal(pageResult.getTotal());
         result.setPages(pageResult.getPages());
         return result;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<UrlLinkVO> batchGenerateUrl(List<ShortUrlParam> params) {
+        if (CollectionUtils.isEmpty(params)) {
+            return null;
+        }
+        params.forEach(param -> {
+            if (!isValidUrl(param.getLongUrl().trim())) {
+                throw new BizException("无效的url");
+            }
+        });
+        List<String> longUrls = params.parallelStream().map(param -> param.getLongUrl().trim()).distinct().collect(Collectors.toList());
+        List<String> uniqueCodes = uniqueCodeService.getUniqueCode(longUrls.size());
+        Map<String, String> codeToLongUrlMap = new HashMap<>();
+        Map<String, String> longUrlToCodeMap = new HashMap<>();
+        List<UrlLink> urlLinks = new ArrayList<>();
+        for(int i = 0 ; i < uniqueCodes.size(); i++) {
+            String uniqueCode = uniqueCodes.get(i);
+            String longUrl = longUrls.get(i);
+            codeToLongUrlMap.put(uniqueCode, longUrl);
+            longUrlToCodeMap.put(longUrl, uniqueCode);
+            long id = idGenerator.nextId();
+            String longUrlMd5 = DigestUtils.md5DigestAsHex(longUrl.getBytes());
+            String shortUrl = domain + uniqueCode;
+            UrlLink urlLink = new UrlLink();
+            urlLink.setId(id);
+            urlLink.setUniqueCode(uniqueCode);
+            urlLink.setShortUrl(shortUrl);
+            urlLink.setLongUrl(longUrl);
+            urlLink.setLongUrlMd5(longUrlMd5);
+            urlLinks.add(urlLink);
+        }
+        saveBatch(urlLinks);
+        redisTemplate.opsForHash().putAll(SHORT_LONG_MAP, codeToLongUrlMap);
+        List<UrlLinkVO> urlLinkVOList = new ArrayList<>();
+        params.forEach(param -> {
+            UrlLinkVO urlLinkVO = PtcBeanUtils.copy(param, UrlLinkVO.class);
+            String uniqueCode = longUrlToCodeMap.get(urlLinkVO.getLongUrl().trim());
+            urlLinkVO.setUniqueCode(uniqueCode);
+            urlLinkVO.setShortUrl(domain + uniqueCode);
+            urlLinkVOList.add(urlLinkVO);
+        });
+        return urlLinkVOList;
+    }
+
+    @Override
+    public void batchDelUrlLink(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return;
+        }
+        urlLinkDAO.deleteBatchIds(ids);
     }
 
     List<UrlLinkDTO> toUrlLinkDTOList(List<UrlLink> urlLinks) {
