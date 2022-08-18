@@ -45,15 +45,18 @@ public class VisitRecordServiceImpl implements VisitRecordService {
     private VisitRecordDAO visitRecordDAO;
     @Resource
     private IdGenerator idGenerator;
+    @Resource
+    private ShortUrlService shortUrlService;
 
 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addVisitRecord(HttpServletRequest request, UrlLink urlLink) {
+    public void addVisitRecord(HttpServletRequest request, String uniqueCode) {
         VisitRecord visitRecord = new VisitRecord();
         long id = idGenerator.nextId();
         visitRecord.setId(id);
+        UrlLink urlLink = shortUrlService.getUrlLink(uniqueCode);
         visitRecord.setUrlLinkId(urlLink.getId());
         visitRecord.setUniqueCode(urlLink.getUniqueCode());
         visitRecord.setVisitTime(new Date());

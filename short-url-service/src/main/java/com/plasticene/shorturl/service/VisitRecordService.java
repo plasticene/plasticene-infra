@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface VisitRecordService {
 
-    void addVisitRecord(HttpServletRequest request, UrlLink urlLink);
+    void addVisitRecord(HttpServletRequest request, String uniqueCode);
 
     PageResult<VisitRecordDTO> getList(VisitQuery query);
 }
