@@ -88,7 +88,7 @@ public class ShortUrlServiceImpl implements ShortUrlService {
         PageResult<UrlLinkDTO> result = new PageResult<>();
         result.setList(urlLinkDTOList);
         result.setTotal(pageResult.getTotal());
-        result.setPages(pageResult.getTotal());
+        result.setPages(pageResult.getPages());
         return result;
     }
 
