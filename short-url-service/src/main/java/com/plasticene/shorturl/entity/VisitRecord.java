@@ -19,7 +19,6 @@ public class VisitRecord extends BaseDO {
     private String clientIp;
     private Date visitTime;
     private String userAgent;
-    private String phoneType;
     private String browserType;
     private String browserVersion;
     private String osType;
