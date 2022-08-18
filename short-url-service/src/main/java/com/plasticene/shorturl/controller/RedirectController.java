@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 @RestController
 @Api(tags = "重定向接口管理")
-@RequestMapping
+@RequestMapping("/x")
 public class RedirectController {
 
     @Resource
