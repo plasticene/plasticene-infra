@@ -44,6 +44,7 @@ swagger-info:
   email: shepherd_zfj163.com
 
 ptc:
+  domain: http://127.0.0.1:18800/x
   trace:
     enable: true
   apiLog:
@@ -54,4 +55,6 @@ unique-code:
   min-size: 200
 
 bloom-init: false
+
+
 
