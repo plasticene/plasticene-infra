@@ -4,13 +4,8 @@ import com.plasticene.shorturl.dto.IpRegion;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.lionsoul.ip2region.xdb.Searcher;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.transform.Source;
 import java.io.IOException;
-import java.net.InetAddress;
 
 /**
  * @author fjzheng
@@ -21,7 +16,6 @@ import java.net.InetAddress;
 public class IpUtils {
 
     private static final String UNKNOWN_VALUE = "unknown";
-    private static final String LOCALHOST_V0 = "0.0.0.0";
     private static final String LOCALHOST_V4 = "127.0.0.1";
     private static final String LOCALHOST_V6 = "0:0:0:0:0:0:0:1";
 
@@ -30,7 +24,6 @@ public class IpUtils {
     private static final String PROXY_CLIENT_IP = "Proxy-Client-IP";
     private static final String WL_PROXY_CLIENT_IP = "WL-Proxy-Client-IP";
     private static final String HTTP_CLIENT_IP = "HTTP_CLIENT_IP";
-    private static final String HTTP_X_FORWARDED_FOR = "HTTP_X_FORWARDED_FOR";
 
     private static final String IP_DATA_PATH = "/Users/shepherdmy/Desktop/ip2region.xdb";
     private static  byte[] contentBuff;
@@ -44,11 +37,6 @@ public class IpUtils {
         }
     }
 
-
-    public static void init() throws IOException {
-        contentBuff = Searcher.loadContentFromFile(IP_DATA_PATH);
-    }
-    {}
 
     /**
      * 获取客户端ip地址
@@ -114,7 +102,7 @@ public class IpUtils {
                 try {
                     searcher.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("close searcher error:", e);
                 }
             }
         }
