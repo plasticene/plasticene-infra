@@ -16,7 +16,6 @@ import com.plasticene.shorturl.param.ShortUrlParam;
 import com.plasticene.shorturl.query.UrlLinkQuery;
 import com.plasticene.shorturl.service.ShortUrlService;
 import com.plasticene.shorturl.service.UniqueCodeService;
-import com.plasticene.shorturl.utils.RandomUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -58,13 +56,16 @@ public class ShortUrlServiceImpl extends ServiceImpl<UrlLinkDAO, UrlLink> implem
 
     @Override
     public String generateShortUrl(String longUrl) {
+        // 1.检验url和合法性
         if (!isValidUrl(longUrl)) {
             throw new BizException("无效的url");
         }
+        // 2.判断url是否已经生成过短链接，有直接返回
         Object value = redisTemplate.opsForHash().get(LONG_MD5_CODE_MAP, longUrl);
         if (Objects.nonNull(value)) {
             return domain + value.toString();
         }
+        // 3.生成短链接
         long id = idGenerator.nextId();
         String uniqueCode = uniqueCodeService.getUniqueCode();
         String longUrlMd5 = DigestUtils.md5DigestAsHex(longUrl.getBytes());
@@ -76,7 +77,9 @@ public class ShortUrlServiceImpl extends ServiceImpl<UrlLinkDAO, UrlLink> implem
         urlLink.setLongUrl(longUrl);
         urlLink.setLongUrlMd5(longUrlMd5);
         urlLinkDAO.insert(urlLink);
+        // 短链接→长链接
         redisTemplate.opsForHash().put(SHORT_LONG_MAP, uniqueCode, longUrl);
+        // 长链接md5→短链接压缩码
         redisTemplate.opsForHash().put(LONG_MD5_CODE_MAP, longUrlMd5, uniqueCode);
         return shortUrl;
     }
@@ -124,6 +127,8 @@ public class ShortUrlServiceImpl extends ServiceImpl<UrlLinkDAO, UrlLink> implem
                 throw new BizException("无效的url");
             }
         });
+
+        // todo 缓存长链接和短链接之间的数据
         List<String> longUrls = params.parallelStream().map(param -> param.getLongUrl().trim()).distinct().collect(Collectors.toList());
         List<String> uniqueCodes = uniqueCodeService.getUniqueCode(longUrls.size());
         Map<String, String> codeToLongUrlMap = new HashMap<>();
@@ -163,6 +168,7 @@ public class ShortUrlServiceImpl extends ServiceImpl<UrlLinkDAO, UrlLink> implem
         if (CollectionUtils.isEmpty(ids)) {
             return;
         }
+        // todo 同步删除链接相关缓存，回收压缩码
         urlLinkDAO.deleteBatchIds(ids);
     }
 
