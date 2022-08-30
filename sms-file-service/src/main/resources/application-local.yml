@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: sms-file-service
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://127.0.0.1:3306/ptc_common?&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+  redis:
+    host: 110.42.224.58
+    port: 6379
+  main:
+    allow-circular-references: true
+#  mvc:
+#    pathmatch:
+#      matching-strategy: ant_path_matcher
+
+
+
+#mybatis
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/*.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.plasticene.base.entity
+  configuration:
+    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
+    global-config:
+      db-config:
+        id-type: NONE # “智能”模式，基于 IdTypeEnvironmentPostProcessor + 数据源的类型，自动适配成 AUTO、INPUT 模式。
+        #      id-type: AUTO # 自增 ID，适合 MySQL 等直接自增的数据库
+        #      id-type: INPUT # 用户输入 ID，适合 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库
+        #      id-type: ASSIGN_ID # 分配 ID，默认使用雪花算法。注意，Oracle、PostgreSQL、Kingbase、DB2、H2 数据库时，需要去除实体类上的 @KeySequence 注解
+#        logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+#        logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+
+
+swagger-info:
+  title: sms-file-service
+  description: 短信&文件服务
+  version: 1.0.0
+  base-package: com.plasticene.base.controller
+  url: http://www.shepherd126.top/
+  author: shepherd
+  email: shepherd_zfj163.com
+
+ptc:
+  trace:
+    enable: true
+  apiLog:
+    enable: true
+
+
+
+
+

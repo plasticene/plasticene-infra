@@ -1,0 +1,15 @@
+server:
+  port: 18801
+
+spring:
+  profiles:
+    active: local
+
+
+
+
+
+aliyun-sms:
+  accessKeyId: LTAI4GHpv2y35PBVWUt42fJ6
+  accessSecret: VoF8212psWmcsb424bKVeg7eMZkKzA
+  regionId: cn-hangzhou
