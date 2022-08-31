@@ -11,6 +11,8 @@ public interface SmsClientFactory {
 
     SmsClient getSmsClient(Long signId);
 
-    SmsClient getSmsClient(String signType);
+    SmsClient getSmsClient(String signCode);
+
+    SmsClient getSmsClient(Integer signType);
 
 }

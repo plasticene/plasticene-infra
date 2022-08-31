@@ -1,6 +1,10 @@
 package com.plasticene.base.client;
 
+import com.plasticene.base.dto.SmsSignReq;
+import com.plasticene.base.dto.SmsTemplateReq;
 import com.plasticene.base.vo.SmsResult;
+
+import java.util.List;
 
 /**
  * @author fjzheng
@@ -10,6 +14,18 @@ import com.plasticene.base.vo.SmsResult;
 public interface SmsClient {
 
     SmsResult sendSms(String mobile, String signName, String templateCode, String params);
+
+    SmsResult batchSendSms(List<SmsResult> mobiles, String signName, String templateCode, String params);
+
+    void addSign(SmsSignReq signReq);
+
+    void addTemplate(SmsTemplateReq templateReq);
+
+    void checkSignStatus();
+
+    void checkTemplateStatus();
+
+
 
 
 
