@@ -49,6 +49,12 @@ ptc:
   apiLog:
     enable: true
 
+sms:
+  aliyun:
+    accessKeyId: LTAI4GHpv2y35PBVWUt42fJ6
+    accessSecret: VoF8212psWmcsb424bKVeg7eMZkKzA
+    regionId: cn-hangzhou
+
 
 
 
