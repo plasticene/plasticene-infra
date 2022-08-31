@@ -30,7 +30,7 @@ public class Sample {
         SendSmsRequest request = new SendSmsRequest();
         request.setPhoneNumbers("17816875939");
         request.setSignName("shepherd");
-        request.setTemplateCode("SMS_193518103");
+        request.setTemplateCode("SMS_1935181031");
         request.setTemplateParam("{\"code\":\"345890\"}");
 
         try {

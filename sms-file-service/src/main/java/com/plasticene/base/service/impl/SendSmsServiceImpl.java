@@ -1,6 +1,7 @@
 package com.plasticene.base.service.impl;
 
 import com.plasticene.base.client.SmsClient;
+import com.plasticene.base.factory.SmsClientFactory;
 import com.plasticene.base.param.SendSmsParam;
 import com.plasticene.base.service.SendSmsService;
 import com.plasticene.base.vo.SmsResult;
@@ -18,11 +19,11 @@ import javax.annotation.Resource;
 public class SendSmsServiceImpl implements SendSmsService {
 
     @Resource
-    private SmsClient smsClient;
+    private SmsClientFactory smsClientFactory;
     @Override
     public void sendSms(SendSmsParam param) {
+        SmsClient smsClient = smsClientFactory.getSmsClient(param.getType());
         SmsResult smsResult = smsClient.sendSms(param.getMobile(), param.getSignName(), param.getTemplateCode(), JsonUtils.toJsonString(param.getParams()));
         System.out.println(smsResult);
-
     }
 }

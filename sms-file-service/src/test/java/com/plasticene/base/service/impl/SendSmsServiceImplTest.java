@@ -27,11 +27,12 @@ public class SendSmsServiceImplTest {
     @Test
     public void sendSms() {
         SendSmsParam param = new SendSmsParam();
+        param.setType(0);
         param.setMobile("17816875939");
         param.setSignName("shepherd");
         param.setTemplateCode("SMS_193518103");
         Map<String, Object> map = new HashMap<>();
-        map.put("code", "167890");
+        map.put("code", "083150");
         param.setParams(map);
         sendSmsService.sendSms(param);
 
