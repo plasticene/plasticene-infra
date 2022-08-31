@@ -16,7 +16,7 @@ public class SmsSign extends BaseDO {
     private Long id;
 
     /**
-     * 签名唯一码，用于签名使用
+     * 签名自定义唯一码，方便业务团队使用签名
      */
     private String code;
 
@@ -26,12 +26,12 @@ public class SmsSign extends BaseDO {
     private String name;
 
     /**
-     * 启用开关 0：关闭  1：关闭
+     * 是否审核通过 0：否  1：是
      */
     private String status;
 
     /**
-     * 签名类型：0：阿里云   1：腾讯云  2：云片短信
+     * 签名类型：0：阿里云   1：云片  2：腾讯云
      */
     private Integer type;
 
@@ -44,4 +44,9 @@ public class SmsSign extends BaseDO {
      * 备注
      */
     private String remark;
+
+    /**
+     * 失败原因
+     */
+    private String failReason;
 }
