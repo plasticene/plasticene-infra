@@ -7,6 +7,7 @@ import com.aliyuncs.dysmsapi.model.v20170525.*;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.plasticene.base.config.AliyunClientProperties;
+import com.plasticene.base.constant.SmsSignConstant;
 import com.plasticene.base.dto.SmsSignReq;
 import com.plasticene.base.dto.SmsTemplateReq;
 import com.plasticene.base.vo.SmsResult;
@@ -40,9 +41,6 @@ public class AliyunSmsClient implements SmsClient{
     }
 
 
-
-
-
     @Override
     public SmsResult sendSms(String mobile, String signName, String templateCode, String params) {
         SmsResult smsResult = new SmsResult();
@@ -69,22 +67,33 @@ public class AliyunSmsClient implements SmsClient{
     }
 
     @Override
-    public void addSign(SmsSignReq signReq) {
+    public SmsResult addSign(SmsSignReq signReq) {
         AddSmsSignRequest request = new AddSmsSignRequest();
         request.setSignName(signReq.getSignName());
-        request.setSignSource(signReq.getSignSource());
+        request.setSignSource(SmsSignConstant.ALIYUN_SOURCE_WEBSITE);
         request.setRemark(signReq.getRemark());
-        request.setSignFileLists(signReq.getFileList());
+
+        List<AddSmsSignRequest.SignFileList> signFileListList = new ArrayList<>();
+
+        AddSmsSignRequest.SignFileList signFileList = new AddSmsSignRequest.SignFileList();
+        signFileList.setFileContents("R0lGODlhHAAmAKIHAKqqqsvLy0hISObm5vf394uL");
+        signFileList.setFileSuffix("jpg");
+        signFileListList.add(signFileList);
+        request.setSignFileLists(signFileListList);
         try {
+            // 正常返回响应结果，但并不代表就调用成功了，只有code==OK是成功的，其他事阿里云的检测到的不合法情况，具体看message
             AddSmsSignResponse response = client.getAcsResponse(request);
+            SmsResult smsResult = PtcBeanUtils.copy(response, SmsResult.class);
+            return smsResult;
         } catch (ClientException e) {
+            // 正常情况只有秘钥不对，或者参数传的不对，如少传必填参数，阿里云会直接报错，其他情况都会正常返回
             log.error("调用阿里云添加签名失败:", e);
             throw new BizException("调用阿里云添加签名失败");
         }
     }
 
     @Override
-    public void addTemplate(SmsTemplateReq templateReq) {
+    public SmsResult addTemplate(SmsTemplateReq templateReq) {
         AddSmsTemplateRequest request = new AddSmsTemplateRequest();
         request.setTemplateType(templateReq.getType());
         request.setTemplateName(templateReq.getName());
@@ -96,7 +105,7 @@ public class AliyunSmsClient implements SmsClient{
             log.error("调用阿里云添加模板失败:", e);
             throw new BizException("调用阿里云添加模板失败");
         }
-
+        return null;
     }
 
     @Override

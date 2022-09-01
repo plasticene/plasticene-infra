@@ -57,7 +57,7 @@ public class DefaultSmsClientFactory implements SmsClientFactory {
     }
 
     @Override
-    public SmsClient getSmsClient(Integer signType) {
-        return signTypeClients.get(signType);
+    public SmsClient getSmsClient(Integer channelType) {
+        return signTypeClients.get(channelType);
     }
 }

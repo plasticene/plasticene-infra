@@ -23,13 +23,13 @@ public class TencentSmsClient implements SmsClient{
     }
 
     @Override
-    public void addSign(SmsSignReq signReq) {
-
+    public SmsResult addSign(SmsSignReq signReq) {
+        return null;
     }
 
     @Override
-    public void addTemplate(SmsTemplateReq templateReq) {
-
+    public SmsResult addTemplate(SmsTemplateReq templateReq) {
+        return null;
     }
 
     @Override

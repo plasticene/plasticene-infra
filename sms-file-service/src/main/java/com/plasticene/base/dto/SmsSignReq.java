@@ -23,17 +23,18 @@ public class SmsSignReq {
 
     // 阿里云参数
     private String signName;
-    private Integer signSource;
     private String remark;
-    private List<AddSmsSignRequest.SignFileList> fileList;
+    private Integer signType;
+//    private Integer signSource;
+//    private List<AddSmsSignRequest.SignFileList> fileList;
 
     // 腾讯云参数
-    private String SignName;
-    private Integer SignType;
-    private Integer DocumentType;
-    private Integer International;
-    private Integer SignPurpose;
-    private Integer ProofImage;
+//    private String SignName;
+//    private Integer SignType;
+//    private Integer DocumentType;
+//    private Integer International;
+//    private Integer SignPurpose;
+//    private Integer ProofImage;
 
     // 云片参数
     private String apikey;

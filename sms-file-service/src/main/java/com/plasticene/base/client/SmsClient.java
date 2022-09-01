@@ -17,9 +17,9 @@ public interface SmsClient {
 
     SmsResult batchSendSms(List<SmsResult> mobiles, String signName, String templateCode, String params);
 
-    void addSign(SmsSignReq signReq);
+    SmsResult addSign(SmsSignReq signReq);
 
-    void addTemplate(SmsTemplateReq templateReq);
+    SmsResult addTemplate(SmsTemplateReq templateReq);
 
     void checkSignStatus();
 
