@@ -13,6 +13,6 @@ public interface SmsClientFactory {
 
     SmsClient getSmsClient(String signCode);
 
-    SmsClient getSmsClient(Integer signType);
+    SmsClient getSmsClient(Integer channelType);
 
 }
