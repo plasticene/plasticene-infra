@@ -28,12 +28,12 @@ public class SmsSign extends BaseDO {
     /**
      * 是否审核通过 0：否  1：是
      */
-    private String status;
+    private Integer status;
 
     /**
-     * 签名类型：0：阿里云   1：云片  2：腾讯云
+     * 签名渠道类型：0：阿里云   1：云片  2：腾讯云
      */
-    private Integer type;
+    private Integer channelType;
 
     /**
      * 业务类型
