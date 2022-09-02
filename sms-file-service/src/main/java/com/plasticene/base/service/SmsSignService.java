@@ -1,5 +1,6 @@
 package com.plasticene.base.service;
 
+import com.plasticene.base.entity.SmsSign;
 import com.plasticene.base.param.SmsSignParam;
 
 /**
@@ -12,4 +13,6 @@ public interface SmsSignService {
     void addSmsSign(SmsSignParam param);
 
     void auditSmsSign(Long signId);
+
+    SmsSign get(Long signId);
 }

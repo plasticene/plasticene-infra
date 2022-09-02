@@ -52,6 +52,7 @@ public class SmsSignServiceImpl implements SmsSignService {
         setSignStatus(signId, smsResult);
     }
 
+    @Override
     public SmsSign get(Long signId) {
         return smsSignDAO.selectById(signId);
     }
