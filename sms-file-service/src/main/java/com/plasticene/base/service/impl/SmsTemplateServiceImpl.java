@@ -58,7 +58,8 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
 
-    SmsTemplate get(Long templateId) {
+    @Override
+    public SmsTemplate get(Long templateId) {
         return smsTemplateDAO.selectById(templateId);
     }
 

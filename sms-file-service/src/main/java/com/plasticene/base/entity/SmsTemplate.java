@@ -79,6 +79,11 @@ public class SmsTemplate extends BaseDO {
      */
     private Integer type;
 
+    /**
+     * 渠道类型 0：阿里云  1：云片  2：腾讯
+     */
+    private Integer channelType;
+
 
 
 

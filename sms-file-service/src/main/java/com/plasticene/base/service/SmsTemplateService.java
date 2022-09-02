@@ -1,5 +1,6 @@
 package com.plasticene.base.service;
 
+import com.plasticene.base.entity.SmsTemplate;
 import com.plasticene.base.param.SmsTemplateParam;
 
 /**
@@ -12,4 +13,6 @@ public interface SmsTemplateService {
     void addSmsTemplate(SmsTemplateParam param);
 
     void auditSmsTemplate(Long templateId);
+
+    SmsTemplate get(Long templateId);
 }
