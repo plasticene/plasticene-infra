@@ -14,8 +14,7 @@ import com.plasticene.base.vo.SmsResult;
 import com.plasticene.boot.common.exception.BizException;
 import com.plasticene.boot.common.utils.PtcBeanUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,11 +100,12 @@ public class AliyunSmsClient implements SmsClient{
         request.setRemark(templateReq.getRemark());
         try {
             AddSmsTemplateResponse response = client.getAcsResponse(request);
+            SmsResult smsResult = PtcBeanUtils.copy(response, SmsResult.class);
+            return smsResult;
         } catch (ClientException e) {
             log.error("调用阿里云添加模板失败:", e);
             throw new BizException("调用阿里云添加模板失败");
         }
-        return null;
     }
 
     @Override
