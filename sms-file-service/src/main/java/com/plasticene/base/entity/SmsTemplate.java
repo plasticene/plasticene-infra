@@ -1,9 +1,12 @@
 package com.plasticene.base.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.plasticene.boot.mybatis.core.handlers.JsonStringSetTypeHandler;
 import com.plasticene.boot.mybatis.core.metadata.BaseDO;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author fjzheng
@@ -42,7 +45,9 @@ public class SmsTemplate extends BaseDO {
     /**
      * 模板变量参数
      */
-    private List<String> params;
+
+    @TableField(typeHandler = JsonStringSetTypeHandler.class)
+    private Set<String> params;
 
     /**
      * 备注
