@@ -7,7 +7,7 @@ import com.plasticene.base.param.SendSmsParam;
  * @version 1.0
  * @date 2022/8/30 16:45
  */
-public interface SendSmsService {
+public interface SmsSendService {
 
     void sendSms(SendSmsParam param);
 }

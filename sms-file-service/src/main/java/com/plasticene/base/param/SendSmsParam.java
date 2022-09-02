@@ -11,9 +11,7 @@ import java.util.Map;
  */
 @Data
 public class SendSmsParam {
-    private Integer type;
     private String mobile;
-    private String signName;
-    private String templateCode;
+    private Long templateId;
     private Map<String, Object> params;
 }

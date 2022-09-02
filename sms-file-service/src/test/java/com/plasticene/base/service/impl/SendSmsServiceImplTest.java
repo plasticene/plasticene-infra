@@ -1,7 +1,7 @@
 package com.plasticene.base.service.impl;
 
 import com.plasticene.base.param.SendSmsParam;
-import com.plasticene.base.service.SendSmsService;
+import com.plasticene.base.service.SmsSendService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,8 +10,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * @author fjzheng
@@ -22,19 +20,19 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 public class SendSmsServiceImplTest {
     @Resource
-    private SendSmsService sendSmsService;
+    private SmsSendService smsSendService;
 
     @Test
     public void sendSms() {
-        SendSmsParam param = new SendSmsParam();
-        param.setType(0);
-        param.setMobile("17816875939");
-        param.setSignName("shepherd");
-        param.setTemplateCode("SMS_193518103");
-        Map<String, Object> map = new HashMap<>();
-        map.put("code", "083150");
-        param.setParams(map);
-        sendSmsService.sendSms(param);
+//        SendSmsParam param = new SendSmsParam();
+//        param.setType(0);
+//        param.setMobile("17816875939");
+//        param.setSignName("shepherd");
+//        param.setTemplateCode("SMS_193518103");
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("code", "083150");
+//        param.setParams(map);
+//        smsSendService.sendSms(param);
 
     }
 }
