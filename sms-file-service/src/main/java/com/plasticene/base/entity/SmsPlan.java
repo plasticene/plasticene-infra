@@ -1,0 +1,57 @@
+package com.plasticene.base.entity;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.plasticene.boot.mybatis.core.handlers.JsonStringSetTypeHandler;
+import com.plasticene.boot.mybatis.core.metadata.BaseDO;
+import lombok.Data;
+
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @author fjzheng
+ * @version 1.0
+ * @date 2022/9/5 10:22
+ */
+@Data
+public class SmsPlan extends BaseDO {
+    /**
+     * 主键
+     */
+    private Long id;
+
+    /**
+     * 签名id
+     */
+    private Long signId;
+
+    /**
+     * 模板id
+     */
+    private Long templateId;
+
+    /**
+     * 状态
+     */
+    private Integer status;
+
+    /**
+     * 手机号
+     */
+    @TableField(typeHandler = JsonStringSetTypeHandler.class)
+    private Set<String> mobiles;
+
+    /**
+     * 执行类型：0：立即执行   1：定时执行
+     */
+    private Integer executeType;
+
+    /**
+     * 变量参数
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, Object> params;
+
+
+}
