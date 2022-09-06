@@ -1,5 +1,7 @@
 package com.plasticene.base.client;
 
+import com.alibaba.fastjson.JSONArray;
+import com.plasticene.base.dto.SmsCallbackDTO;
 import com.plasticene.base.dto.SmsSignReq;
 import com.plasticene.base.dto.SmsTemplateReq;
 import com.plasticene.base.vo.SmsResult;
@@ -40,5 +42,10 @@ public class YunPianSmsClient implements SmsClient {
     @Override
     public void checkTemplateStatus() {
 
+    }
+
+    @Override
+    public List<SmsCallbackDTO> handleSmsSendCallback(JSONArray jsonArray) {
+        return null;
     }
 }

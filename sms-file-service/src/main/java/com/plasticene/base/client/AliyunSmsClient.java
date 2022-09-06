@@ -1,6 +1,9 @@
 package com.plasticene.base.client;
 
 
+import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.dysmsapi.model.v20170525.*;
@@ -8,6 +11,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.plasticene.base.config.AliyunClientProperties;
 import com.plasticene.base.constant.SmsSignConstant;
+import com.plasticene.base.dto.SmsCallbackDTO;
 import com.plasticene.base.dto.SmsSignReq;
 import com.plasticene.base.dto.SmsTemplateReq;
 import com.plasticene.base.vo.SmsResult;
@@ -145,6 +149,23 @@ public class AliyunSmsClient implements SmsClient{
     @Override
     public void checkTemplateStatus() {
 
+    }
+
+    @Override
+    public List<SmsCallbackDTO> handleSmsSendCallback(JSONArray jsonArray) {
+        List<SmsCallbackDTO> smsCallbackDTOS = new ArrayList<>();
+        for(int i = 0; i < jsonArray.size(); i++) {
+            JSONObject rst = jsonArray.getJSONObject(i);
+            SmsCallbackDTO smsCallback = new SmsCallbackDTO();
+            smsCallback.setSuccess(Boolean.valueOf(rst.getString("success")));
+            smsCallback.setMobile(rst.getString("phone_number"));
+            smsCallback.setErrorCode(rst.getString("err_code"));
+            smsCallback.setErrorMsg(rst.getString("err_msg"));
+            smsCallback.setReceiveTime(DateUtil.parse(rst.getString("report_time")));
+            smsCallback.setPlatformId(rst.getString("biz_id"));
+            smsCallbackDTOS.add(smsCallback);
+        }
+        return smsCallbackDTOS;
     }
 
     public static void main(String[] args) {

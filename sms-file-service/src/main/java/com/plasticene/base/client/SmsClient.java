@@ -1,5 +1,7 @@
 package com.plasticene.base.client;
 
+import com.alibaba.fastjson.JSONArray;
+import com.plasticene.base.dto.SmsCallbackDTO;
 import com.plasticene.base.dto.SmsSignReq;
 import com.plasticene.base.dto.SmsTemplateReq;
 import com.plasticene.base.vo.SmsResult;
@@ -24,6 +26,10 @@ public interface SmsClient {
     void checkSignStatus();
 
     void checkTemplateStatus();
+
+    List<SmsCallbackDTO> handleSmsSendCallback(JSONArray jsonArray);
+
+
 
 
 
