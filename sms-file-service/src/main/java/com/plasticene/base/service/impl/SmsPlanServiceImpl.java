@@ -52,6 +52,7 @@ public class SmsPlanServiceImpl implements SmsPlanService {
         SmsPlan smsPlan = PtcBeanUtils.copy(param, SmsPlan.class);
         long id = idGenerator.nextId();
         smsPlan.setId(id);
+        smsPlan.setTotalCount(smsPlan.getMobiles().size());
         smsPlanDAO.insert(smsPlan);
         SmsPlanDTO smsPlanDTO = toSmsPlanDTO(smsPlan);
         // 这里使用监听redis过期key来实现定时发送，这种方式并不稳妥，具体原因看RedisKeyExpiredListener类注释
@@ -62,8 +63,8 @@ public class SmsPlanServiceImpl implements SmsPlanService {
             });
         } else {
             Date sendTime = param.getSendTime();
-            int minute = getMinute(new Date(), sendTime);
-            redisTemplate.opsForValue().set(SmsConstant.SMS_PLAN_KEY + id, "", minute, TimeUnit.MINUTES);
+            int second = getSecond(new Date(), sendTime);
+            redisTemplate.opsForValue().set(SmsConstant.SMS_PLAN_KEY + id, "", second, TimeUnit.SECONDS);
             redisTemplate.opsForValue().set(SmsConstant.SMS_PLAN_VALUE + id, smsPlanDTO);
         }
 
@@ -79,14 +80,14 @@ public class SmsPlanServiceImpl implements SmsPlanService {
         return smsPlanDTO;
     }
 
-    public  int getMinute(Date current, Date sendTime) {
+    public  int getSecond(Date current, Date sendTime) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(sendTime);
         long sTime = calendar.getTimeInMillis();
         calendar.setTime(current);
         long cTime = calendar.getTimeInMillis();
-        long minute = (sTime - cTime) / (1000 * 60);
-        return (int)minute;
+        long second = (sTime - cTime) / 1000;
+        return (int)second;
     }
 
     public static void main(String[] args) throws ParseException {

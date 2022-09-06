@@ -1,18 +1,21 @@
 package com.plasticene.base.controller;
 
+import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.json.JSONArray;
+import com.plasticene.base.dto.SmsPlanDTO;
 import com.plasticene.base.param.SendSmsParam;
 import com.plasticene.base.param.SmsPlanParam;
+import com.plasticene.base.query.SmsPlanQuery;
 import com.plasticene.base.service.SmsPlanService;
 import com.plasticene.base.service.SmsSendService;
+import com.plasticene.boot.common.pojo.PageResult;
 import com.plasticene.boot.web.core.anno.ResponseResultBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author fjzheng
@@ -41,6 +44,15 @@ public class SmsSendController {
     public void addSmsPlan(@RequestBody SmsPlanParam param) {
         smsPlanService.addSmsPlan(param);
     }
+
+    @ApiOperation("短信计划列表")
+    @GetMapping("/plan")
+    public PageResult<SmsPlanDTO> getSmsPlanList(SmsPlanQuery query) {
+        return null;
+    }
+
+
+
 
 
 

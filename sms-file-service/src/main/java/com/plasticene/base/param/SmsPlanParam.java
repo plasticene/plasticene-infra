@@ -14,6 +14,7 @@ import java.util.Set;
  */
 @Data
 public class SmsPlanParam {
+    private String name;
     private Set<String> mobiles;
     private Long templateId;
     private Long signId;
