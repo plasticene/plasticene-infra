@@ -59,5 +59,7 @@ public class SmsRecord extends BaseDO {
 
     private String apiReceiveMsg;
 
+    private Long planId;
+
 
 }

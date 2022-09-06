@@ -25,4 +25,6 @@ public class SmsResult {
      * API 请求编号
      */
     private String requestId;
+
+    private String bizId;
 }

@@ -1,6 +1,8 @@
 package com.plasticene.base.service;
 
+import com.plasticene.base.dto.SmsPlanDTO;
 import com.plasticene.base.param.SendSmsParam;
+import com.plasticene.base.param.SmsPlanParam;
 
 /**
  * @author fjzheng
@@ -10,4 +12,6 @@ import com.plasticene.base.param.SendSmsParam;
 public interface SmsSendService {
 
     void sendSms(SendSmsParam param);
+
+    void addSmsRecordAndSendSms(SmsPlanDTO smsPlanDTO);
 }

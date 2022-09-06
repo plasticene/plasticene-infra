@@ -1,4 +1,4 @@
-package com.plasticene.base;
+package com.plasticene.base.vo;
 
 import lombok.Data;
 
