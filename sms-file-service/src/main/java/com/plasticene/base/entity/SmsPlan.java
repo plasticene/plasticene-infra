@@ -6,6 +6,7 @@ import com.plasticene.boot.mybatis.core.handlers.JsonStringSetTypeHandler;
 import com.plasticene.boot.mybatis.core.metadata.BaseDO;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +21,11 @@ public class SmsPlan extends BaseDO {
      * 主键
      */
     private Long id;
+
+    /**
+     * 计划名称
+     */
+    private String name;
 
     /**
      * 签名id
@@ -48,10 +54,26 @@ public class SmsPlan extends BaseDO {
     private Integer executeType;
 
     /**
+     * 定时发送指定的时间
+     */
+    private Date sendTime;
+
+    /**
      * 变量参数
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> params;
+
+    /**
+     * 总数
+     */
+    private Integer totalCount;
+
+    /**
+     * 成功发送数
+     */
+    private Integer successCount;
+
 
 
 }

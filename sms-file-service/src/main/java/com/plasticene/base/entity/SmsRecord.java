@@ -33,7 +33,7 @@ public class SmsRecord extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> params;
 
-    private String apiTemplateCode;
+    private Integer channelType;
 
     private String mobile;
 
@@ -49,7 +49,7 @@ public class SmsRecord extends BaseDO {
 
     private String apiRequestId;
 
-    private String apiSerialNo;
+    private String platformId;
 
     private Integer receiveStatus;
 

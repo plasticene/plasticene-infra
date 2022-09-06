@@ -82,7 +82,7 @@ public class SmsTemplate extends BaseDO {
     /**
      * 渠道类型 0：阿里云  1：云片  2：腾讯
      */
-    private Integer channelType;
+//    private Integer channelType;
 
 
 
