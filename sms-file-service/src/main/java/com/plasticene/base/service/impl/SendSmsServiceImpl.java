@@ -1,10 +1,12 @@
 package com.plasticene.base.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.plasticene.base.client.SmsClient;
 import com.plasticene.base.constant.SmsConstant;
 import com.plasticene.base.dao.SmsPlanDAO;
 import com.plasticene.base.dao.SmsRecordDAO;
+import com.plasticene.base.dto.SmsCallbackDTO;
 import com.plasticene.base.dto.SmsPlanDTO;
 import com.plasticene.base.entity.SmsPlan;
 import com.plasticene.base.entity.SmsRecord;
@@ -20,13 +22,16 @@ import com.plasticene.base.vo.SmsResult;
 import com.plasticene.boot.common.utils.IdGenerator;
 import com.plasticene.boot.common.utils.JsonUtils;
 import com.plasticene.boot.common.utils.PtcBeanUtils;
+import com.plasticene.boot.mybatis.core.query.LambdaQueryWrapperX;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author fjzheng
@@ -72,6 +77,7 @@ public class SendSmsServiceImpl extends ServiceImpl<SmsRecordDAO, SmsRecord> imp
             smsRecord.setTemplateType(smsTemplate.getType());
             smsRecord.setParams(smsPlanDTO.getParams());
             smsRecord.setContent(smsTemplate.getContent());
+            smsRecord.setChannelType(smsSign.getChannelType());
             smsRecordList.add(smsRecord);
         }
         saveBatch(smsRecordList);
@@ -103,10 +109,45 @@ public class SendSmsServiceImpl extends ServiceImpl<SmsRecordDAO, SmsRecord> imp
             update.setApiSendCode(smsResult.getCode());
             update.setApiSendMsg(smsResult.getMessage());
             update.setApiRequestId(smsResult.getRequestId());
-            update.setApiSerialNo(smsResult.getBizId());
+            update.setPlatformId(smsResult.getBizId());
             updateRecords.add(update);
         });
         updateBatchById(updateRecords);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSmsReceiveStatus(Integer channelType, JSONArray jsonArray) {
+        if (jsonArray.size() == 0) {
+            return;
+        }
+        SmsClient smsClient = smsClientFactory.getSmsClient(channelType);
+        List<SmsCallbackDTO> smsCallbackDTOList = smsClient.handleSmsSendCallback(jsonArray);
+        List<String> platformIds = smsCallbackDTOList.parallelStream().map(SmsCallbackDTO::getPlatformId).distinct()
+                .collect(Collectors.toList());
+        List<SmsRecord> smsRecordList = getSmsRecordList(channelType, platformIds);
+        if (CollectionUtils.isEmpty(smsRecordList)) {
+            return;
+        }
+        List<SmsRecord> updateSmsRecordList = new ArrayList<>();
+        smsRecordList.forEach(smsRecord -> {
+            SmsCallbackDTO callback = smsCallbackDTOList.parallelStream().filter(smsCallbackDTO -> Objects.equals(smsCallbackDTO.getMobile(),
+                    smsRecord.getMobile()) && Objects.equals(smsCallbackDTO.getPlatformId(), smsRecord.getPlatformId())).findFirst().orElse(null);
+            if (Objects.isNull(callback)) {
+                return;
+            }
+            SmsRecord update = new SmsRecord();
+            update.setId(smsRecord.getId());
+            update.setReceiveStatus(callback.getSuccess() ? SmsConstant.SMS_RECEIVE_STATUS_SUCCESS : SmsConstant.SMS_RECEIVE_STATUS_FAIL);
+            update.setApiReceiveCode(callback.getErrorCode());
+            update.setApiReceiveMsg(callback.getErrorMsg());
+            update.setReceiveTime(callback.getReceiveTime());
+            updateSmsRecordList.add(update);
+        });
+
+        if (!CollectionUtils.isEmpty(updateSmsRecordList)) {
+            updateBatchById(updateSmsRecordList);
+        }
     }
 
     void addSmsRecord(SendSmsParam param, SmsTemplate smsTemplate, SmsSign smsSign) {
@@ -118,6 +159,15 @@ public class SendSmsServiceImpl extends ServiceImpl<SmsRecordDAO, SmsRecord> imp
         smsRecord.setParams(param.getParams());
         smsRecord.setContent(smsTemplate.getContent());
         smsRecordDAO.insert(smsRecord);
+    }
+
+    List<SmsRecord> getSmsRecordList(Integer channelType, List<String> platformIds) {
+        LambdaQueryWrapperX<SmsRecord> queryWrapper = new LambdaQueryWrapperX<>();
+        queryWrapper.select(SmsRecord::getId, SmsRecord::getMobile, SmsRecord::getPlatformId);
+        queryWrapper.eq(SmsRecord::getChannelType, channelType);
+        queryWrapper.in(SmsRecord::getPlatformId, platformIds);
+        List<SmsRecord> smsRecords = smsRecordDAO.selectList(queryWrapper);
+        return smsRecords;
     }
 
 

@@ -20,4 +20,8 @@ public interface SmsConstant {
     Integer SMS_SEND_STATUS_INIT = 0;
     Integer SMS_SEND_STATUS_SUCCESS = 1;
     Integer SMS_SEND_STATUS_FAIL = -1;
+
+    Integer SMS_RECEIVE_STATUS_INIT = 0;
+    Integer SMS_RECEIVE_STATUS_SUCCESS = 1;
+    Integer SMS_RECEIVE_STATUS_FAIL = -1;
 }
