@@ -18,7 +18,7 @@ public class TencentSmsClient implements SmsClient{
     }
 
     @Override
-    public SmsResult batchSendSms(List<SmsResult> mobiles, String signName, String templateCode, String params) {
+    public SmsResult batchSendSms(List<String> mobiles, String signName, String templateCode, String params) {
         return null;
     }
 

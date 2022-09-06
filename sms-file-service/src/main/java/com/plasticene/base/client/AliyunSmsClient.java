@@ -12,12 +12,12 @@ import com.plasticene.base.dto.SmsSignReq;
 import com.plasticene.base.dto.SmsTemplateReq;
 import com.plasticene.base.vo.SmsResult;
 import com.plasticene.boot.common.exception.BizException;
+import com.plasticene.boot.common.utils.JsonUtils;
 import com.plasticene.boot.common.utils.PtcBeanUtils;
 import lombok.extern.slf4j.Slf4j;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author fjzheng
@@ -43,7 +43,6 @@ public class AliyunSmsClient implements SmsClient{
     @Override
     public SmsResult sendSms(String mobile, String signName, String templateCode, String params) {
         SmsResult smsResult = new SmsResult();
-
         SendSmsRequest request = new SendSmsRequest();
         request.setPhoneNumbers(mobile);
         request.setSignName(signName);
@@ -60,9 +59,39 @@ public class AliyunSmsClient implements SmsClient{
         return smsResult;
     }
 
+    /**
+     * 阿里云的批量发送短信 手机号数量，签名数量，模版参数数量要一致，
+     * 这意味我们可以批量发送的同时给不同的手机号指定不同的签名和模板变量
+     * @param mobiles
+     * @param signName
+     * @param templateCode
+     * @param params
+     * @return
+     */
     @Override
-    public SmsResult batchSendSms(List<SmsResult> mobiles, String signName, String templateCode, String params) {
-        return null;
+    public SmsResult batchSendSms(List<String> mobiles, String signName, String templateCode, String params) {
+        SmsResult smsResult = new SmsResult();
+        Map map = JsonUtils.parseObject(params, Map.class);
+        List<String> signNames = new ArrayList<>();
+        List<Map> paramList = new ArrayList<>();
+        for (int i = 0; i < mobiles.size(); i++) {
+            signNames.add(signName);
+            paramList.add(map);
+        }
+        SendBatchSmsRequest request = new SendBatchSmsRequest();
+        request.setPhoneNumberJson(JsonUtils.toJsonString(mobiles));
+        request.setSignNameJson(JsonUtils.toJsonString(signNames));
+        request.setTemplateCode(templateCode);
+        request.setTemplateParamJson(JsonUtils.toJsonString(paramList));
+        try {
+            SendBatchSmsResponse response = client.getAcsResponse(request);
+            smsResult = PtcBeanUtils.copy(response, SmsResult.class);
+        } catch (ClientException e) {
+            smsResult.setCode(e.getErrCode());
+            smsResult.setMessage(e.getErrMsg());
+            smsResult.setRequestId(e.getRequestId());
+        }
+        return smsResult;
     }
 
     @Override
@@ -116,6 +145,19 @@ public class AliyunSmsClient implements SmsClient{
     @Override
     public void checkTemplateStatus() {
 
+    }
+
+    public static void main(String[] args) {
+        Map<String,Object> params = new HashMap<>();
+        params.put("name", "shepherd");
+        List<Map<String, Object>> paramList = new ArrayList<>();
+        paramList.add(params);
+        paramList.add(params);
+        System.out.println(JsonUtils.toJsonString(paramList));
+        List<String> list = new ArrayList<>();
+        list.add(JsonUtils.toJsonString(params));
+        list.add(JsonUtils.toJsonString(params));
+        System.out.println(JsonUtils.toJsonString(list));
     }
 
 

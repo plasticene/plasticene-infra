@@ -15,7 +15,7 @@ public interface SmsClient {
 
     SmsResult sendSms(String mobile, String signName, String templateCode, String params);
 
-    SmsResult batchSendSms(List<SmsResult> mobiles, String signName, String templateCode, String params);
+    SmsResult batchSendSms(List<String> mobiles, String signName, String templateCode, String params);
 
     SmsResult addSign(SmsSignReq signReq);
 
