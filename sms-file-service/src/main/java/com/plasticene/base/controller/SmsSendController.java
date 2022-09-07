@@ -3,9 +3,11 @@ package com.plasticene.base.controller;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.json.JSONArray;
 import com.plasticene.base.dto.SmsPlanDTO;
+import com.plasticene.base.dto.SmsRecordDTO;
 import com.plasticene.base.param.SendSmsParam;
 import com.plasticene.base.param.SmsPlanParam;
 import com.plasticene.base.query.SmsPlanQuery;
+import com.plasticene.base.query.SmsRecordQuery;
 import com.plasticene.base.service.SmsPlanService;
 import com.plasticene.base.service.SmsSendService;
 import com.plasticene.boot.common.pojo.PageResult;
@@ -49,6 +51,14 @@ public class SmsSendController {
     @GetMapping("/plan")
     public PageResult<SmsPlanDTO> getSmsPlanList(SmsPlanQuery query) {
         return null;
+    }
+
+
+    @ApiOperation("短信记录列表")
+    @GetMapping("/record")
+    public PageResult<SmsRecordDTO> getSmsRecordList(SmsRecordQuery query) {
+        PageResult<SmsRecordDTO> pageResult = smsSendService.getList(query);
+        return pageResult;
     }
 
 

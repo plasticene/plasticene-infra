@@ -8,6 +8,7 @@ import com.plasticene.base.dao.SmsPlanDAO;
 import com.plasticene.base.dao.SmsRecordDAO;
 import com.plasticene.base.dto.SmsCallbackDTO;
 import com.plasticene.base.dto.SmsPlanDTO;
+import com.plasticene.base.dto.SmsRecordDTO;
 import com.plasticene.base.entity.SmsPlan;
 import com.plasticene.base.entity.SmsRecord;
 import com.plasticene.base.entity.SmsSign;
@@ -19,10 +20,13 @@ import com.plasticene.base.handler.DefaultSmsTemplatePlaceHolderHandler;
 import com.plasticene.base.handler.SmsTemplatePlaceHolderHandler;
 import com.plasticene.base.param.SendSmsParam;
 import com.plasticene.base.param.SmsPlanParam;
+import com.plasticene.base.query.SmsRecordQuery;
 import com.plasticene.base.service.SmsSendService;
 import com.plasticene.base.service.SmsSignService;
 import com.plasticene.base.service.SmsTemplateService;
 import com.plasticene.base.vo.SmsResult;
+import com.plasticene.boot.common.pojo.PageParam;
+import com.plasticene.boot.common.pojo.PageResult;
 import com.plasticene.boot.common.utils.IdGenerator;
 import com.plasticene.boot.common.utils.JsonUtils;
 import com.plasticene.boot.common.utils.PtcBeanUtils;
@@ -189,6 +193,19 @@ public class SendSmsServiceImpl extends ServiceImpl<SmsRecordDAO, SmsRecord> imp
         }
     }
 
+    @Override
+    public PageResult<SmsRecordDTO> getList(SmsRecordQuery query) {
+        LambdaQueryWrapperX<SmsRecord> queryWrapper = new LambdaQueryWrapperX<>();
+        PageParam param = new PageParam(query.getPageNo(), query.getPageSize());
+        PageResult<SmsRecord> pageResult = smsRecordDAO.selectPage(param, queryWrapper);
+        List<SmsRecordDTO> smsRecordDTOList = toSmsRecordDTOList(pageResult.getList());
+        PageResult<SmsRecordDTO> result = new PageResult<>();
+        result.setList(smsRecordDTOList);
+        result.setPages(pageResult.getPages());
+        result.setTotal(pageResult.getTotal());
+        return result;
+    }
+
     void addSmsRecord(SendSmsParam param, SmsTemplate smsTemplate, SmsSign smsSign) {
         SmsRecord smsRecord = new SmsRecord();
         smsRecord.setMobile(param.getMobile());
@@ -207,6 +224,18 @@ public class SendSmsServiceImpl extends ServiceImpl<SmsRecordDAO, SmsRecord> imp
         queryWrapper.in(SmsRecord::getPlatformId, platformIds);
         List<SmsRecord> smsRecords = smsRecordDAO.selectList(queryWrapper);
         return smsRecords;
+    }
+
+    List<SmsRecordDTO> toSmsRecordDTOList(List<SmsRecord> smsRecords) {
+        List<SmsRecordDTO> smsRecordDTOList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(smsRecords)) {
+            return smsRecordDTOList;
+        }
+        smsRecords.forEach(smsRecord -> {
+            SmsRecordDTO smsRecordDTO = PtcBeanUtils.copy(smsRecord, SmsRecordDTO.class);
+            smsRecordDTOList.add(smsRecordDTO);
+        });
+        return smsRecordDTOList;
     }
 
 
