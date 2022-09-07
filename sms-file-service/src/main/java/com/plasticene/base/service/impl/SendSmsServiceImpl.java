@@ -12,7 +12,11 @@ import com.plasticene.base.entity.SmsPlan;
 import com.plasticene.base.entity.SmsRecord;
 import com.plasticene.base.entity.SmsSign;
 import com.plasticene.base.entity.SmsTemplate;
+import com.plasticene.base.enums.SmsSendRejectStrategyEnum;
 import com.plasticene.base.factory.SmsClientFactory;
+import com.plasticene.base.factory.SmsSendRejectStrategyFactory;
+import com.plasticene.base.handler.DefaultSmsTemplatePlaceHolderHandler;
+import com.plasticene.base.handler.SmsTemplatePlaceHolderHandler;
 import com.plasticene.base.param.SendSmsParam;
 import com.plasticene.base.param.SmsPlanParam;
 import com.plasticene.base.service.SmsSendService;
@@ -23,11 +27,13 @@ import com.plasticene.boot.common.utils.IdGenerator;
 import com.plasticene.boot.common.utils.JsonUtils;
 import com.plasticene.boot.common.utils.PtcBeanUtils;
 import com.plasticene.boot.mybatis.core.query.LambdaQueryWrapperX;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +56,20 @@ public class SendSmsServiceImpl extends ServiceImpl<SmsRecordDAO, SmsRecord> imp
     @Resource
     private SmsRecordDAO smsRecordDAO;
 
+    private SmsTemplatePlaceHolderHandler placeHolderHandler;
+
+    @Value("${sms.reject-strategy}")
+    private SmsSendRejectStrategyEnum rejectStrategyEnum;
+
+    @PostConstruct
+    public void init() {
+        if (rejectStrategyEnum == null) {
+            rejectStrategyEnum = SmsSendRejectStrategyEnum.FULL_MATCH;
+        }
+        placeHolderHandler =
+                new DefaultSmsTemplatePlaceHolderHandler(SmsSendRejectStrategyFactory.getStrategy(rejectStrategyEnum));
+    }
+
 
 
     @Override
@@ -67,6 +87,16 @@ public class SendSmsServiceImpl extends ServiceImpl<SmsRecordDAO, SmsRecord> imp
         List<SmsRecord> smsRecordList = new ArrayList<>();
         SmsTemplate smsTemplate = smsTemplateService.get(smsPlanDTO.getTemplateId());
         SmsSign smsSign = smsSignService.get(smsPlanDTO.getSignId());
+        String content = null;
+        Boolean isReject = false;
+        String errMsg = null;
+        try {
+            content = placeHolderHandler.handle(smsTemplate, smsPlanDTO.getParams());
+        } catch (Exception e) {
+            // 报错说明被拒绝了
+            isReject = true;
+            errMsg = e.getMessage();
+        }
         List<String> mobiles = smsPlanDTO.getMobiles();
         for(String mobile : mobiles) {
             SmsRecord smsRecord = new SmsRecord();
@@ -76,11 +106,20 @@ public class SendSmsServiceImpl extends ServiceImpl<SmsRecordDAO, SmsRecord> imp
             smsRecord.setSignId(smsPlanDTO.getSignId());
             smsRecord.setTemplateType(smsTemplate.getType());
             smsRecord.setParams(smsPlanDTO.getParams());
-            smsRecord.setContent(smsTemplate.getContent());
             smsRecord.setChannelType(smsSign.getChannelType());
             smsRecordList.add(smsRecord);
+            if (isReject) {
+                smsRecord.setContent(smsTemplate.getContent());
+                smsRecord.setSendStatus(SmsConstant.SMS_SEND_STATUS_FAIL);
+                smsRecord.setSendMsg(errMsg);
+            } else {
+                smsRecord.setContent(content);
+            }
         }
         saveBatch(smsRecordList);
+        if (isReject) {
+            return;
+        }
         SmsClient smsClient = smsClientFactory.getSmsClient(smsSign.getChannelType());
         SmsResult smsResult;
         if (smsPlanDTO.getMobiles().size() == 1) {
