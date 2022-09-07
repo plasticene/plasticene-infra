@@ -21,10 +21,25 @@ public class SmsSendAnyMatchStrategy implements SmsSendRejectStrategy{
 
     @Override
     public void reject(SmsTemplate smsTemplate, Map<String, Object> params) {
+        // 说明模板没有变量
+        if (CollectionUtils.isEmpty(smsTemplate.getParams())) {
+            return;
+        }
+        if (Objects.isNull(params)) {
+            throw new BizException("模板参数不能为空");
+        }
         Set<String> keySet = params.entrySet().stream().filter(entry -> Objects.nonNull(entry.getValue())).map(Map.Entry::getKey).collect(Collectors.toSet());
         if (CollectionUtils.intersection(smsTemplate.getParams(), keySet).size() <= 0) {
             log.error("短信占位符替换参数与短信模板完全不匹配,templateContent = {},params = {}", smsTemplate.getContent(), params);
             throw new BizException("短信占位符替换参数与短信模板完全不匹配");
         }
+        // 有匹配的参数，需要对空值参数填充，这样才能正常调用短信平台
+        Set<String> paramSet = smsTemplate.getParams();
+        for(String key : paramSet) {
+            if (Objects.isNull(params.get(key))) {
+                params.put(key, " ");
+            }
+        }
+
     }
 }
