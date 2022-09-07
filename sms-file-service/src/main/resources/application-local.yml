@@ -14,6 +14,18 @@ spring:
 #  mvc:
 #    pathmatch:
 #      matching-strategy: ant_path_matcher
+  rabbitmq:
+    host: 10.10.0.10
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        acknowledge-mode: manual
+  #    publisher-confirm-type: correlated
+  #    publisher-returns: true
+  #    template:
+  #      mandatory: true
 
 
 
@@ -54,6 +66,8 @@ sms:
     accessKeyId: LTAI4GHpv2y35PBVWUt42fJ6
     accessSecret: VoF8212psWmcsb424bKVeg7eMZkKzA
     regionId: cn-hangzhou
+
+  reject-strategy: ANY_MATCH
 
 
 
