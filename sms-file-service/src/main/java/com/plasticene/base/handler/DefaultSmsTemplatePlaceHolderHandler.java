@@ -2,6 +2,7 @@ package com.plasticene.base.handler;
 
 import com.plasticene.base.entity.SmsTemplate;
 import com.plasticene.base.strategy.SmsSendRejectStrategy;
+import com.plasticene.base.utils.PlaceHolderUtils;
 
 import java.util.Map;
 
@@ -19,6 +20,8 @@ public class DefaultSmsTemplatePlaceHolderHandler implements SmsTemplatePlaceHol
     }
     @Override
     public String handle(SmsTemplate smsTemplate, Map<String, Object> params) {
-        return null;
+        rejectStrategy.reject(smsTemplate, params);
+        String content = PlaceHolderUtils.replacePlaceHolder(smsTemplate, params);
+        return content;
     }
 }

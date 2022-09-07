@@ -29,7 +29,8 @@ public class PlaceHolderUtils {
         String content = smsTemplate.getContent();
         Set<String> paramSet = smsTemplate.getParams();
         for(String key : paramSet) {
-
+            String value = params.get(key) == null ? " " : params.get(key).toString();
+            content = content.replace(ALIYUN_PLACEHOLDER_PREFIX + key + ALIYUN_PLACEHOLDER_SUFFIX, value);
         }
         return content;
 
