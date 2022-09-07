@@ -1,6 +1,7 @@
 package com.plasticene.base.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.plasticene.boot.mybatis.core.handlers.JsonStringSetTypeHandler;
 import com.plasticene.boot.mybatis.core.metadata.BaseDO;
 import lombok.Data;
@@ -15,6 +16,7 @@ import java.util.Set;
  */
 
 @Data
+@TableName(autoResultMap = true)
 public class SmsTemplate extends BaseDO {
 
     /**
