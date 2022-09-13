@@ -1,5 +1,8 @@
 package com.plasticene.base.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.plasticene.boot.mybatis.core.handlers.EncryptTypeHandler;
 import com.plasticene.boot.mybatis.core.metadata.BaseDO;
 import lombok.Data;
 
@@ -9,6 +12,7 @@ import lombok.Data;
  * @date 2022/9/9 17:54
  */
 @Data
+@TableName(autoResultMap = true)
 public class SmsChannel extends BaseDO {
 
     /**
@@ -34,5 +38,6 @@ public class SmsChannel extends BaseDO {
     /**
      * 渠道api秘钥
      */
+    @TableField(typeHandler = EncryptTypeHandler.class)
     private String apiSecret;
 }

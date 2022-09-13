@@ -1,6 +1,7 @@
 package com.plasticene.base.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.plasticene.boot.mybatis.core.metadata.BaseDO;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.Map;
  * @date 2022/8/31 16:10
  */
 @Data
+@TableName(autoResultMap = true)
 public class SmsRecord extends BaseDO {
 
     private Long id;

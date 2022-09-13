@@ -49,4 +49,6 @@ public class SmsSign extends BaseDO {
      * 失败原因
      */
     private String failReason;
+
+    private Long channelId;
 }

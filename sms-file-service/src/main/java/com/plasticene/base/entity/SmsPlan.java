@@ -1,6 +1,7 @@
 package com.plasticene.base.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.plasticene.boot.mybatis.core.handlers.JsonStringSetTypeHandler;
 import com.plasticene.boot.mybatis.core.metadata.BaseDO;
@@ -16,6 +17,7 @@ import java.util.Set;
  * @date 2022/9/5 10:22
  */
 @Data
+@TableName(autoResultMap = true)
 public class SmsPlan extends BaseDO {
     /**
      * 主键
