@@ -25,11 +25,6 @@ public class SmsTemplate extends BaseDO {
     private  Long id;
 
     /**
-     * 模版自定义code，供业务团队使用模板
-     */
-    private String code;
-
-    /**
      * 模版名称
      */
     private String name;
@@ -72,9 +67,9 @@ public class SmsTemplate extends BaseDO {
     private String signCode;
 
     /**
-     * 服务方的短信模版code
+     * 服务方的短信模版id
      */
-    private String apiTemplateCode;
+    private String outId;
 
     /**
      * 短信类型 0：验证码  1：通知  2：营销推广
@@ -84,7 +79,12 @@ public class SmsTemplate extends BaseDO {
     /**
      * 渠道类型 0：阿里云  1：云片  2：腾讯
      */
-//    private Integer channelType;
+    private Integer channelType;
+
+    /**
+     * 短信平台渠道id
+     */
+    private Long channelId;
 
 
 
