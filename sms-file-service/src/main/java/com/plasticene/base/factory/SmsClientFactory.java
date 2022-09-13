@@ -1,6 +1,9 @@
 package com.plasticene.base.factory;
 
 import com.plasticene.base.client.SmsClient;
+import com.plasticene.base.message.SmsChannelMessage;
+
+import java.util.List;
 
 /**
  * @author fjzheng
@@ -9,10 +12,12 @@ import com.plasticene.base.client.SmsClient;
  */
 public interface SmsClientFactory {
 
-    SmsClient getSmsClient(Long signId);
-
-    SmsClient getSmsClient(String signCode);
+    SmsClient getSmsClient(Long channelId);
 
     SmsClient getSmsClient(Integer channelType);
+
+    void saveSmsClient(SmsChannelMessage message);
+
+    void delSmsClient(List<Long> channelIds);
 
 }

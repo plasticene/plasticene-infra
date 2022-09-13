@@ -16,5 +16,5 @@ import org.springframework.context.annotation.Configuration;
 public class AliyunClientProperties {
     private String accessKeyId;
     private String accessSecret;
-    private String regionId;
+    private String regionId="cn-hangzhou";
 }
