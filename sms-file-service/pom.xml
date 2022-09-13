@@ -48,6 +48,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.plasticene.boot</groupId>
+            <artifactId>plasticene-boot-starter-cache</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
