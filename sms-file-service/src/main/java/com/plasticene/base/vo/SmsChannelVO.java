@@ -1,5 +1,7 @@
 package com.plasticene.base.vo;
 
+import com.plasticene.boot.web.core.anno.FieldMask;
+import com.plasticene.boot.web.core.enums.MaskEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -23,5 +25,6 @@ public class SmsChannelVO {
     private String apiKey;
 
     @ApiModelProperty("api秘钥")
+    @FieldMask(MaskEnum.API_SECRET)
     private String apiSecret;
 }
