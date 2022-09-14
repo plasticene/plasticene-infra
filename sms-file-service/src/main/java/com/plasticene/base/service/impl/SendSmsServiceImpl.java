@@ -124,14 +124,19 @@ public class SendSmsServiceImpl extends ServiceImpl<SmsRecordDAO, SmsRecord> imp
         if (isReject) {
             return;
         }
-        SmsClient smsClient = smsClientFactory.getSmsClient(smsSign.getChannelType());
+        SmsClient smsClient;
+        if (Objects.nonNull(smsSign.getChannelId())) {
+            smsClient = smsClientFactory.getSmsClient(smsSign.getChannelId());
+        } else {
+            smsClient = smsClientFactory.getSmsClient(smsSign.getChannelType());
+        }
         SmsResult smsResult;
         if (smsPlanDTO.getMobiles().size() == 1) {
             smsResult = smsClient.sendSms(smsPlanDTO.getMobiles().get(0), smsSign.getName(),
-                    smsTemplate.getApiTemplateCode(), JsonUtils.toJsonString(smsPlanDTO.getParams()));
+                    smsTemplate.getOutId(), JsonUtils.toJsonString(smsPlanDTO.getParams()));
         } else {
             smsResult = smsClient.batchSendSms(smsPlanDTO.getMobiles(), smsSign.getName(),
-                    smsTemplate.getApiTemplateCode(), JsonUtils.toJsonString(smsPlanDTO.getParams()));
+                    smsTemplate.getOutId(), JsonUtils.toJsonString(smsPlanDTO.getParams()));
         }
         List<SmsRecord> updateRecords = new ArrayList<>();
         Integer sendStatus;
