@@ -5,11 +5,13 @@ import com.plasticene.base.service.SmsSendService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author fjzheng
@@ -21,6 +23,8 @@ import java.util.Map;
 public class SendSmsServiceImplTest {
     @Resource
     private SmsSendService smsSendService;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @Test
     public void sendSms() {
@@ -34,5 +38,10 @@ public class SendSmsServiceImplTest {
 //        param.setParams(map);
 //        smsSendService.sendSms(param);
 
+    }
+
+    @Test
+    public void test() {
+        redisTemplate.opsForValue().set("hello", "123456", 30, TimeUnit.SECONDS);
     }
 }
