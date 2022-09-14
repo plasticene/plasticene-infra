@@ -2,11 +2,15 @@ package com.plasticene.base.controller;
 
 import com.plasticene.base.param.SmsChannelParam;
 import com.plasticene.base.query.SmsChannelQuery;
+import com.plasticene.base.service.SmsChannelService;
 import com.plasticene.base.vo.SmsChannelVO;
+import com.plasticene.boot.common.pojo.PageResult;
+import com.plasticene.boot.web.core.anno.ResponseResultBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -25,30 +29,35 @@ import java.util.List;
  */
 @Api(tags = "短信渠道管理")
 @RestController
+@ResponseResultBody
 @RequestMapping("/sms/channel")
 public class SmsChannelController {
+    @Resource
+    private SmsChannelService smsChannelService;
 
     @PostMapping
     @ApiOperation("添加渠道")
     public void addSmsChannel(@RequestBody SmsChannelParam param) {
+        smsChannelService.addSmsChannel(param);
 
     }
     @PutMapping("/{channelId}")
     @ApiOperation("更新渠道")
     public void updateSmsChannel(@PathVariable("channelId")Long channelId, @RequestBody SmsChannelParam param) {
-
+        smsChannelService.updateSmsChannel(channelId, param);
     }
 
     @DeleteMapping
     @ApiOperation("删除渠道(批量)")
     public void delSmsChannel(@RequestBody List<Long> channelIds) {
-
+        smsChannelService.deleteSmsChannel(channelIds);
     }
 
 
     @GetMapping
     @ApiOperation("获取渠道列表")
-    public List<SmsChannelVO> getList(SmsChannelQuery query) {
-        return null;
+    public PageResult<SmsChannelVO> getList(SmsChannelQuery query) {
+        PageResult<SmsChannelVO> pageResult = smsChannelService.getList(query);
+        return pageResult;
     }
 }

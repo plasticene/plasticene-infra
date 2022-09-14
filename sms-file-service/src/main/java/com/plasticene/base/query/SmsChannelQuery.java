@@ -1,5 +1,6 @@
 package com.plasticene.base.query;
 
+import com.plasticene.boot.common.pojo.PageParam;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -9,7 +10,7 @@ import lombok.Data;
  * @date 2022/9/13 10:24
  */
 @Data
-public class SmsChannelQuery {
+public class SmsChannelQuery extends PageParam {
     @ApiModelProperty("渠道名称")
     private String name;
 
