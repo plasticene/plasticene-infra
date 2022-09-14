@@ -2,6 +2,8 @@ package com.plasticene.base.enums;
 
 import lombok.Getter;
 
+import java.util.stream.Stream;
+
 /**
  * @author fjzheng
  * @version 1.0
@@ -20,6 +22,10 @@ public enum SmsChannelEnum {
     SmsChannelEnum(Integer type, String name) {
         this.type = type;
         this.name = name;
+    }
+
+    public static SmsChannelEnum getType(Integer type) {
+        return Stream.of(SmsChannelEnum.values()).filter(bean -> bean.getType().equals(type)).findFirst().orElse(null);
     }
 
 }
