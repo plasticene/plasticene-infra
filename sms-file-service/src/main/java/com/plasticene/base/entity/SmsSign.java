@@ -16,11 +16,6 @@ public class SmsSign extends BaseDO {
     private Long id;
 
     /**
-     * 签名自定义唯一码，方便业务团队使用签名
-     */
-    private String code;
-
-    /**
      * 签名名称
      */
     private String name;
@@ -50,5 +45,8 @@ public class SmsSign extends BaseDO {
      */
     private String failReason;
 
+    /**
+     * 渠道id
+     */
     private Long channelId;
 }
