@@ -1,6 +1,9 @@
 package com.plasticene.base.service;
 
+import com.plasticene.base.dto.SmsPlanDTO;
 import com.plasticene.base.param.SmsPlanParam;
+import com.plasticene.base.query.SmsPlanQuery;
+import com.plasticene.boot.common.pojo.PageResult;
 
 /**
  * @author fjzheng
@@ -10,4 +13,6 @@ import com.plasticene.base.param.SmsPlanParam;
 public interface SmsPlanService {
 
     void addSmsPlan(SmsPlanParam param);
+
+    PageResult<SmsPlanDTO> getList(SmsPlanQuery query);
 }

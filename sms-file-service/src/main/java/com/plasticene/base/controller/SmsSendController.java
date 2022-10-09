@@ -50,9 +50,8 @@ public class SmsSendController {
     @ApiOperation("短信计划列表")
     @GetMapping("/plan")
     public PageResult<SmsPlanDTO> getSmsPlanList(SmsPlanQuery query) {
-        return null;
+        return smsPlanService.getList(query);
     }
-
 
     @ApiOperation("短信记录列表")
     @GetMapping("/record")

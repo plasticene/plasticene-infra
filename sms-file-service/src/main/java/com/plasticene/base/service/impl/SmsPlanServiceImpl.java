@@ -3,12 +3,17 @@ package com.plasticene.base.service.impl;
 import com.plasticene.base.constant.SmsConstant;
 import com.plasticene.base.dao.SmsPlanDAO;
 import com.plasticene.base.dto.SmsPlanDTO;
+import com.plasticene.base.dto.SmsRecordDTO;
 import com.plasticene.base.entity.SmsPlan;
 import com.plasticene.base.param.SmsPlanParam;
+import com.plasticene.base.query.SmsPlanQuery;
 import com.plasticene.base.service.SmsPlanService;
 import com.plasticene.base.service.SmsSendService;
+import com.plasticene.boot.common.pojo.PageParam;
+import com.plasticene.boot.common.pojo.PageResult;
 import com.plasticene.boot.common.utils.IdGenerator;
 import com.plasticene.boot.common.utils.PtcBeanUtils;
+import com.plasticene.boot.mybatis.core.query.LambdaQueryWrapperX;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -17,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -100,6 +102,24 @@ public class SmsPlanServiceImpl implements SmsPlanService {
 //            redisTemplate.opsForValue().set(SmsConstant.SMS_PLAN_VALUE + id, smsPlanDTO);
 //        }
 
+    }
+
+    @Override
+    public PageResult<SmsPlanDTO> getList(SmsPlanQuery query) {
+        LambdaQueryWrapperX<SmsPlan> queryWrapper = new LambdaQueryWrapperX<>();
+        queryWrapper.likeIfPresent(SmsPlan::getName, query.getName());
+        PageParam param = new PageParam(query.getPageNo(), query.getPageSize());
+        PageResult<SmsPlan> pageResult = smsPlanDAO.selectPage(param, queryWrapper);
+        List<SmsPlan> smsPlans = pageResult.getList();
+        List<SmsPlanDTO> smsPlanDTOList = new ArrayList<>();
+        smsPlans.forEach(smsPlan -> {
+            smsPlanDTOList.add(toSmsPlanDTO(smsPlan));
+        });
+        PageResult<SmsPlanDTO> result = new PageResult<>();
+        result.setList(smsPlanDTOList);
+        result.setPages(pageResult.getPages());
+        result.setTotal(pageResult.getTotal());
+        return result;
     }
 
     SmsPlanDTO toSmsPlanDTO(SmsPlan smsPlan) {
