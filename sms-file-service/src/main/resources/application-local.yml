@@ -7,8 +7,8 @@ spring:
     password: root
     url: jdbc:mysql://127.0.0.1:3306/ptc_common?&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
   redis:
-    host: 10.10.0.10
-    port: 6379
+    host: 124.222.145.215
+    port: 26379
   main:
     allow-circular-references: true
 #  mvc:
@@ -63,8 +63,8 @@ ptc:
 
 sms:
   aliyun:
-    accessKeyId: LTAI4GHpv2y35PBVWUt42fJ6
-    accessSecret: VoF8212psWmcsb424bKVeg7eMZkKzA
+    accessKeyId: 123
+    accessSecret: 123
     regionId: cn-hangzhou
 
   reject-strategy: ANY_MATCH
